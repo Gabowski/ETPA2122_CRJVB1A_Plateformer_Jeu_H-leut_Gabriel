@@ -1,0 +1,1862 @@
+<!doctype html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8" /><title>END_GAME</title>
+            <script
+            src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+            <style type="text/css"> body { margin: 0; }</style>
+        </head>
+        <body>
+            <script type="text/javascript">
+
+                class Acceuil extends Phaser.Scene {
+                    constructor() {
+                        super("Acceuil")
+                    }
+
+                    preload(){
+
+                        this.load.image("Title_Screen", "Assets/TITLE_SCREEN.png"); // Charger l'image d'acceuil
+
+                    }
+
+                    create(){
+
+
+                        this.imageAcceuil = this.physics.add.staticGroup();
+                        this.imageAcceuil.create(750, 375, 'Title_Screen').setScale(1); // Emplacement de l'image d'acceuil
+
+                        this.cursors = this.input.keyboard.createCursorKeys();
+                    }
+
+                    update(){
+
+                        
+                        if (this.cursors.space.isDown){ // En appyant sur la touche "espace"
+                        this.scene.start("Frolegatt"); // On passe de la scene de l'image d'acceuil à la scene "Plaine"
+                        }
+                        
+
+                    }
+
+                }
+
+                class Frolegatt extends Phaser.Scene {
+                    constructor() {
+                        super("Frolegatt")
+
+                        this.gameOver = false;
+                        this.vieJoueur;
+                        this.player;  
+                        this.nbSaut = 1;
+                        this.jump = false;
+                        this.attacking = false;
+                        this.direction = 'right';
+                        this.botte_collectee = false;
+
+                        this.Pieces;
+                        this.hache = false;
+                        this.powerUp_hache;
+                        this.fireOn = false;
+                        this.petiteclee;
+                        this.score = 0;
+                        this.scoreText;
+                        this.cursors;
+                        this.groupeBoule;
+                        this.barreDeVie;
+                        this.barreInventaire;
+                        this.grandeclee;
+                        this.coffre;
+                        this.petitecleecollectee = false;
+                        this.portetemple;
+                        this.grandecleecollectee = false;
+                        this.nombrecollide = 5;
+                        this.invincible = false;
+                        this.compteur = 120;
+                        this.invincibleMonstre = false;
+                        this.compteurMonstre = 120;
+                        this.nombrecollideMonstre = 3;
+                        
+                    }
+                    
+
+                    preload(){
+
+                        this.load.image("Phaser_tuilesdejeu", "Assets/ASSETS.png"); // Charger le png du tileset
+                        this.load.tilemapTiledJSON("carte", "MAP.json"); // Charger la map tiled
+                        this.load.spritesheet('Njord', 'Assets/Njord_Mouvement.png', // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.spritesheet("Njord_hache", "Assets/Marche_hache.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.spritesheet('pieces', 'Assets/Piece.png', // Charger la pièce
+                        { frameWidth: 32, frameHeight: 32});
+
+                        this.load.spritesheet('Power_up_saut', 'Assets/Power_up_saut_anim.png', // Charger le power up saut
+                        { frameWidth: 32, frameHeight: 32});
+
+                        this.load.image("PowerUp_Hache", "Assets/HACHE.png");
+
+                        this.load.image("Barre_inventaire_0", "Assets/Barre_i_1.png");
+                        this.load.image("Barre_inventaire_1", "Assets/Barre_i_2.png");
+                        this.load.image("Barre_inventaire_2", "Assets/Barre_i_3.png");
+                        this.load.image("Barre_inventaire_3", "Assets/Barre_i_4.png");
+                        this.load.image("Barre_inventaire_4", "Assets/Barre_i_5.png");
+                        this.load.image("Barre_inventaire_5", "Assets/Barre_i_6.png");
+
+                        this.load.image("Barre_PV_5", "Assets/Barre_vie_5.png");
+                        this.load.image("Barre_PV_4", "Assets/Barre_vie_4.png");
+                        this.load.image("Barre_PV_3", "Assets/Barre_vie_3.png");
+                        this.load.image("Barre_PV_2", "Assets/Barre_vie_2.png");
+                        this.load.image("Barre_PV_1", "Assets/Barre_vie_1.png");
+
+                        this.load.image("Sapin__colide", "Assets/Sapin_Colide.png");
+
+                        this.load.image("villageois", "Assets/Villageois.png");
+
+                        this.load.image("SpriteDialogue", "Assets/SpriteDialogue.png");
+
+                        this.load.image("Eau_Mal", "Assets/Eau_collide.png");
+
+                        this.load.spritesheet("Njord_Attaque", "Assets/Njord_attaque.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                    }
+
+                    create(){
+                        this.variabledelamortquitue = 0
+
+                        
+                        this.carteDuNiveau = this.add.tilemap("carte");
+                        
+
+                        // Importer les Tileset
+                        this.tileset = this.carteDuNiveau.addTilesetImage(
+                            "ASSETS",
+                            "Phaser_tuilesdejeu"
+                        );
+
+                        this.fond = this.carteDuNiveau.createLayer(
+                            "Fond",
+                            this.tileset
+                        );
+
+                        
+                        this.sol_fond = this.carteDuNiveau.createLayer(
+                            "Sol_fond",
+                            this.tileset
+                        );
+
+                        this.pont = this.carteDuNiveau.createLayer(
+                            "Pont",
+                            this.tileset
+                        );
+
+                        this.drakkar = this.carteDuNiveau.createLayer(
+                            "Drakkar",
+                            this.tileset
+                        );
+
+                        this.mur = this.carteDuNiveau.createLayer(
+                            "Mur",
+                            this.tileset
+                        );
+
+                        this.eau = this.carteDuNiveau.createLayer(
+                            "Eau",
+                            this.tileset
+                        );
+
+                        this.sol = this.carteDuNiveau.createLayer(
+                            "Sol",
+                            this.tileset
+                        );
+
+                        this.maison4 = this.carteDuNiveau.createLayer(
+                            "Maison4",
+                            this.tileset
+                        );
+
+                        this.maison1 = this.carteDuNiveau.createLayer(
+                            "Maison1",
+                            this.tileset
+                        );
+
+                        this.maison2 = this.carteDuNiveau.createLayer(
+                            "Maison2",
+                            this.tileset
+                        );
+
+                        this.maison3 = this.carteDuNiveau.createLayer(
+                            "Maison3",
+                            this.tileset
+                        );
+
+                        this.drakkar_devant = this.carteDuNiveau.createLayer(
+                            "Drakkar_devant",
+                            this.tileset
+                        );
+
+                        this.arbres = this.carteDuNiveau.createLayer(
+                            "Arbres",
+                            this.tileset
+                        );
+
+                        this.buissons = this.carteDuNiveau.createLayer(
+                            "Buissons",
+                            this.tileset
+                        );
+
+                        this.cristaux = this.carteDuNiveau.createLayer(
+                            "Cristaux",
+                            this.tileset
+                        );
+
+                        this.rochers = this.carteDuNiveau.createLayer(
+                            "Rochers",
+                            this.tileset
+                        );
+
+                        this.sapin = this.carteDuNiveau.createLayer(
+                            "Sapin",
+                            this.tileset
+                        );
+
+
+                        this.drakkar_devant.setDepth(1);
+                        this.eau.setDepth(1);
+                        this.sapin.setDepth(1);
+
+                        this.drakkar.setCollisionByProperty({ estSolide: true });
+                        this.mur.setCollisionByProperty({ estSolide: true });
+                        this.sol.setCollisionByProperty({ estSolide: true });
+                        this.pont.setCollisionByProperty({ estSolide: true });
+                        this.sapin.setCollisionByProperty({ estSolide: true });
+
+                        this.cameras.main.setBounds(0, -160, 2848, 672);
+                        this.physics.world.setBounds(0, -160, 2848, 672); 
+                        this.cameras.main.zoom = 2;
+
+                        this.player = this.physics.add.sprite(64, 380, 'Njord');
+                        this.villageois = this.physics.add.sprite(600, 360, 'villageois')
+                        this.villageois.body.allowGravity = false
+                        this.SpriteDialogue = this.physics.add.sprite(600, 320, 'SpriteDialogue').setScale(0.8)
+                        this.SpriteDialogue.body.allowGravity = false
+                        this.SpriteDialogue.visible = false
+
+                        this.cameras.main.startFollow(this.player);
+
+                        this.cursors = this.input.keyboard.createCursorKeys();
+
+                        this.physics.add.collider(this.player, this.drakkar);
+                        this.physics.add.collider(this.player, this.sol);
+                        this.physics.add.collider(this.player, this.mur);
+                        this.physics.add.collider(this.player, this.pont);
+                        this.physics.add.collider(this.player, this.sapin);
+                        
+                        this.player.setCollideWorldBounds(true);
+
+                            this.anims.create({
+                            key: 'left',
+                            frames: this.anims.generateFrameNumbers('Njord', {start:3,end:0}),
+                            frameRate: 10,
+                            repeat: -1
+                            });
+                            this.anims.create({
+                            key: 'turn',
+                            frames: [ { key: 'Njord', frame: 4 } ],
+                            frameRate: 20
+                            });
+                            this.anims.create({
+                            key: 'right',
+                            frames: this.anims.generateFrameNumbers('Njord', {start:5,end:8}),
+                            frameRate: 10,
+                            repeat: -1
+                            });
+                        
+
+                            this.anims.create({
+                            key: 'left_hache',
+                            frames: this.anims.generateFrameNumbers('Njord_hache', {start:3,end:0}),
+                            frameRate: 10,
+                            repeat: -1
+                            });
+                            this.anims.create({
+                            key: 'turn_hache',
+                            frames: [ { key: 'Njord_hache', frame: 4 } ],
+                            frameRate: 20
+                            });
+                            this.anims.create({
+                            key: 'right_hache',
+                            frames: this.anims.generateFrameNumbers('Njord_hache', {start:5,end:8}),
+                            frameRate: 10,
+                            repeat: -1
+                            });
+                        
+
+                        this.anims.create({
+                        key: 'tourner',
+                        frames: this.anims.generateFrameNumbers('pieces', {start:0,end:5}),
+                        frameRate: 10,
+                        repeat: -1
+                        });
+
+                        this.anims.create({
+                        key: 'fleches',
+                        frames: this.anims.generateFrameNumbers('Power_up_saut', {start:0,end:9}),
+                        frameRate: 10,
+                        repeat: -1
+                        });
+
+                        this.anims.create({
+                        key: 'left_attaque',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque', {start:2,end:0}),
+                        frameRate: 10,
+                        });
+
+                        this.anims.create({
+                        key: 'right_attaque',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque', {start:3,end:5}),
+                        frameRate: 10,
+                        });
+
+                        this.Hache = this.physics.add.group({ 
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.coins = this.physics.add.group({ 
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.sapin_colide = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        })
+
+                        this.botte = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        })
+
+                        this.eau_mal = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        })
+
+                        this.carteDuNiveau.getObjectLayer('Hache').objects.forEach((Hache) => {
+                            const powerupSprite = this.Hache.create(Hache.x, Hache.y-32, 'PowerUp_Hache').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Pieces').objects.forEach((Pieces) => {
+                            const pieceSprite = this.coins.create(Pieces.x, Pieces.y-32, 'pieces').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Sapin_scene').objects.forEach((sapin_) => {
+                            const sapin_colideSprite = this.sapin_colide.create(sapin_.x, sapin_.y-32, 'Sapin__colide').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Botte').objects.forEach((botte_) => {
+                            const botteSprite = this.botte.create(botte_.x, botte_.y-32, 'Power_up_saut').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Sol_fond').objects.forEach((eau_) => {
+                            const botteSprite = this.eau_mal.create(eau_.x, eau_.y-32, 'Eau_Mal').setOrigin(0);
+                        });
+
+                        this.physics.add.collider(this.player, this.Hache, collectHache, null, this);
+                        this.physics.add.collider(this.player, this.coins, collectPiece, null, this);
+                        this.physics.add.overlap(this.player, this.sapin_colide, Passage_Scene_1, null, this);
+                        this.physics.add.collider(this.player, this.botte, collectBotte, null, this);
+                        this.physics.add.collider(this.player, this.eau_mal, respawn, null, this);
+
+                        this.coins.playAnimation('tourner');
+                        this.botte.playAnimation('fleches');
+
+                        this.scoreText=this.add.text(400,200,'Score: 0',{fontSize:'32px',fill:'#000'}); // Affichage du score du joueur
+                        this.scoreText.setScrollFactor(0); // Affiche un texte à l’écran, pour le score
+
+                        this.score = 0;
+
+                        this.barreInventaire = this.add.image(1035, 530,'Barre_inventaire_0').setScale(1.5);
+                        this.barreInventaire.setInteractive();
+                        this.barreInventaire.setScrollFactor(0);
+
+                        this.barreInventaire.setDepth(1);
+
+                        this.barreDeVie = this.add.image(485, 530, "Barre_PV_5").setScale(1.3);
+                        this.barreDeVie.setInteractive();
+                        this.barreDeVie.setScrollFactor(0);
+
+                        this.barreDeVie.setDepth(1);
+
+                    }
+
+                    update(){
+                        console.log(this.variabledelamortquitue)
+                        if (this.variabledelamortquitue == 3) {
+                            this.scene.start('Gameover')
+                        }
+
+                        if(this.player.x >= 450 && this.player.x >= 500){
+
+                            this.SpriteDialogue.visible = true
+                        }
+                        else{
+
+                            this.SpriteDialogue.visible = false
+                        }
+
+                        //if (gameOver){return;}
+
+                        if(this.attacking == true){return ; }
+
+                        if (this.cursors.left.isDown && this.hache == false){ //si la touche gauche est appuyée
+                            this.player.setVelocityX(-160); //alors vitesse négative en X
+                            this.player.anims.play('left', true); //et animation => gauche
+                        }
+                        else if (this.cursors.left.isDown && this.hache == true){ //si la touche gauche est appuyée
+                            this.player.setVelocityX(-160); //alors vitesse négative en X
+                            this.player.anims.play('left_hache', true); //et animation => gauche
+                            this.direction = 'left';
+                        }
+                        else if (this.cursors.right.isDown && this.hache == false){ //sinon si la touche droite est appuyée
+                            this.player.setVelocityX(160); //alors vitesse positive en X
+                            this.player.anims.play('right', true); //et animation => droite
+                        }
+                        else if (this.cursors.right.isDown && this.hache == true){ //sinon si la touche droite est appuyée
+                            this.player.setVelocityX(160); //alors vitesse positive en X
+                            this.player.anims.play('right_hache', true); //et animation => droite
+                            this.direction = 'right';
+                        }
+                        else if (this.hache == false){ // sinon
+                            this.player.setVelocityX(0); //vitesse nulle
+                            this.player.anims.play('turn'); //animation fait face caméra
+                        }
+                        else if ((this.hache == true)){ // sinon
+                            this.player.setVelocityX(0); //vitesse nulle
+                            this.player.anims.play('turn_hache'); //animation fait face caméra
+                        }
+
+                        if (this.player.body.onFloor() && this.jump==true){
+                            if (this.botte_collectee == true){
+                                this.nbSaut=2;
+                            }else{
+                                this.nbSaut=1;
+                            }
+
+                            this.jump=false;
+                        }
+
+                        if (Phaser.Input.Keyboard.JustDown(this.cursors.up) && this.nbSaut>0){
+                            //si touche haut appuyée ET que le perso touche le sol
+                            this.player.setVelocityY(-270);
+                            this.nbSaut=this.nbSaut-1;
+                            this.jump=true;
+                        }
+
+                        if (this.cursors.space.isDown && this.direction == 'left' && this.hache == true){
+                            this.player.setVelocityX(0)
+                            this.attacking = true
+                            this.player.anims.play('left_attaque', true);
+                            setTimeout(() => {
+                                this.attacking = false
+                            }, 400);
+                        }
+
+                        if (this.cursors.space.isDown && this.direction == 'right' &&this.hache == true){
+                            this.player.setVelocityX(0)
+                            this.attacking = true
+                            this.player.anims.play('right_attaque', true);
+                            setTimeout(() => {
+                                this.attacking = false
+                            }, 400);
+                        }
+
+                        this.scoreText.setText('Score: ' + this.score)
+
+                    }
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                class Scene_ennemis extends Phaser.Scene {
+                    constructor() {
+                        super("Scene_ennemis")
+
+                        this.gameOver = false;
+                        this.vieJoueur;
+                        this.player;    
+                        this.nbSaut = 2;
+                        this.jump = false;
+                        this.attacking = false;
+                        this.direction = 'right';
+
+                        this.Pieces;
+                        this.hache = false;
+                        this.powerUp_hache;
+                        this.fireOn = false;
+                        this.petiteclee;
+                        this.score = 0;
+                        this.scoreText;
+                        this.cursors;
+                        this.groupeBoule;
+                        this.barreDeVie;
+                        this.barreInventaire;
+                        this.grandeclee;
+                        this.coffre;
+                        this.petitecleecollectee = false;
+                        this.portetemple;
+                        this.grandecleecollectee = false;
+                        this.nombrecollide = 5;
+                        this.invincible = false;
+                        this.compteur = 120;
+                        this.invincibleMonstre = false
+                        this.compteurMonstre = 120;
+                        this.nombrecollideMonstre = 3;
+                        
+                    }
+
+                    preload(){
+
+                        this.load.image("Phaser_tuilesdejeu", "Assets/ASSETS.png"); // Charger le png du tileset
+                        this.load.tilemapTiledJSON("carte_", "MAP_ENNEMIS.json"); // Charger la map tiled
+
+                        this.load.spritesheet("Njord_hache", "Assets/Marche_hache.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.spritesheet('pieces', 'Assets/Piece.png', // Charger la pièce
+                        { frameWidth: 32, frameHeight: 32});
+
+                        this.load.spritesheet("Njord_Attaque", "Assets/Njord_attaque.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.image("Barre_inventaire_0", "Assets/Barre_i_1.png");
+                        this.load.image("Barre_inventaire_1", "Assets/Barre_i_2.png");
+                        this.load.image("Barre_inventaire_2", "Assets/Barre_i_3.png");
+                        this.load.image("Barre_inventaire_3", "Assets/Barre_i_4.png");
+                        this.load.image("Barre_inventaire_4", "Assets/Barre_i_5.png");
+                        this.load.image("Barre_inventaire_5", "Assets/Barre_i_6.png");
+
+                        this.load.image("Barre_PV_5", "Assets/Barre_vie_5.png");
+                        this.load.image("Barre_PV_4", "Assets/Barre_vie_4.png");
+                        this.load.image("Barre_PV_3", "Assets/Barre_vie_3.png");
+                        this.load.image("Barre_PV_2", "Assets/Barre_vie_2.png");
+                        this.load.image("Barre_PV_1", "Assets/Barre_vie_1.png");
+
+                        this.load.image("Sapin_colide", "Assets/Sapin__Colide.png");
+
+                        this.load.image("Eau_Mal", "Assets/Eau_collide.png");
+
+                        this.load.image("Piques", "Assets/Pique__.png");
+
+                    }
+
+                    create(){
+
+                        this.variabledelamortquitue = 0
+
+                        this.carteDuNiveau = this.add.tilemap("carte_");
+                        
+
+                        // Importer les Tileset
+                        this.tileset = this.carteDuNiveau.addTilesetImage(
+                            "ASSETS",
+                            "Phaser_tuilesdejeu"
+                        );
+
+                        this.fond = this.carteDuNiveau.createLayer(
+                            "Fond",
+                            this.tileset
+                        );
+
+                        this.mur = this.carteDuNiveau.createLayer(
+                            "Mur",
+                            this.tileset
+                        );
+
+                        this.sol = this.carteDuNiveau.createLayer(
+                            "Sol",
+                            this.tileset
+                        );
+
+                        this.arbres = this.carteDuNiveau.createLayer(
+                            "Arbres",
+                            this.tileset
+                        );
+
+                        this.buissons = this.carteDuNiveau.createLayer(
+                            "Buissons",
+                            this.tileset
+                        );
+
+                        this.cristaux = this.carteDuNiveau.createLayer(
+                            "Cristaux",
+                            this.tileset
+                        );
+
+                        this.rochers = this.carteDuNiveau.createLayer(
+                            "Rochers",
+                            this.tileset
+                        );
+
+                        this.eau = this.carteDuNiveau.createLayer(
+                            "Eau",
+                            this.tileset
+                        );
+
+                        this.sapin = this.carteDuNiveau.createLayer(
+                            "Sapin",
+                            this.tileset
+                        );
+
+                        this.sapin_scene = this.carteDuNiveau.createLayer(
+                            "Sapin_scene",
+                            this.tileset
+                        );
+
+                        this.eau.setDepth(1);
+                        this.sapin.setDepth(1);
+                        this.sapin_scene.setDepth(1);
+
+                        this.mur.setCollisionByProperty({ estSolide: true });
+                        this.sapin.setCollisionByProperty({ estSolide: true });
+                        this.sol.setCollisionByProperty({ estSolide: true });
+                        this.sapin_scene.setCollisionByProperty({ estSolide: true });
+
+                        this.cameras.main.setBounds(0, 0, 2560, 672);
+                        this.physics.world.setBounds(0, 0, 2560, 672); 
+                        this.cameras.main.zoom = 2;
+
+                        this.player = this.physics.add.sprite(352, 500, 'Njord_hache');
+
+                        this.cameras.main.startFollow(this.player);
+
+                        this.cursors = this.input.keyboard.createCursorKeys();
+
+                        this.physics.add.collider(this.player, this.mur);
+                        this.physics.add.collider(this.player, this.sapin);
+                        this.physics.add.collider(this.player, this.sol);
+                        this.physics.add.collider(this.player, this.sapin_scene);
+
+                        this.player.setCollideWorldBounds(true);
+
+                        this.anims.create({
+                            key: 'left__',
+                            frames: this.anims.generateFrameNumbers('Njord_hache', {start:3,end:0}),
+                            frameRate: 10,
+                            repeat: -1
+                            });
+                            this.anims.create({
+                            key: 'turn__',
+                            frames: [ { key: 'Njord_hache', frame: 4 } ],
+                            frameRate: 20
+                            });
+                            this.anims.create({
+                            key: 'right__',
+                            frames: this.anims.generateFrameNumbers('Njord_hache', {start:5,end:8}),
+                            frameRate: 10,
+                            repeat: -1
+                        });
+
+                        this.anims.create({
+                        key: 'tourner',
+                        frames: this.anims.generateFrameNumbers('pieces', {start:0,end:5}),
+                        frameRate: 10,
+                        repeat: -1
+                        });
+
+                        this.anims.create({
+                        key: 'left_attaque',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque', {start:2,end:0}),
+                        frameRate: 10,
+                        });
+
+                        this.anims.create({
+                        key: 'right_attaque',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque', {start:3,end:5}),
+                        frameRate: 10,
+                        });
+
+                        this.coins = this.physics.add.group({ 
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.sapin_collide = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.eau_mal = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.piques = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Pieces').objects.forEach((pieces_) => {
+                            const pieceSprite = this.coins.create(pieces_.x, pieces_.y-32, 'pieces').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Sapin_collide').objects.forEach((sapin_) => {
+                            const sapin_colideSprite = this.sapin_collide.create(sapin_.x, sapin_.y-32, 'Sapin_colide').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Sol_fond').objects.forEach((eau_) => {
+                            const botteSprite = this.eau_mal.create(eau_.x, eau_.y-32, 'Eau_Mal').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Piques_').objects.forEach((piques_) => {
+                            const piquesSprite = this.piques.create(piques_.x, piques_.y-32, 'Piques').setOrigin(0);
+                        });
+
+                        this.physics.add.collider(this.player, this.coins, collectPiece, null, this);
+                        this.physics.add.overlap(this.player, this.sapin_collide, Passage_Scene_2, null, this);
+                        this.physics.add.collider(this.player, this.eau_mal, respawn_, null, this);
+                        this.physics.add.collider(this.player, this.piques, vieHeros, null, this);
+
+                        this.coins.playAnimation('tourner');
+
+                        this.scoreText=this.add.text(400,200,'Score: 0',{fontSize:'32px',fill:'#000'}); // Affichage du score du joueur
+                        this.scoreText.setScrollFactor(0); // Affiche un texte à l’écran, pour le score
+
+                        this.score = 0;
+
+                        this.barreInventaire = this.add.image(1035, 530,'Barre_inventaire_2').setScale(1.5);
+                        this.barreInventaire.setInteractive();
+                        this.barreInventaire.setScrollFactor(0);
+
+                        this.barreInventaire.setDepth(1);
+
+                        this.barreDeVie = this.add.image(485, 530, "Barre_PV_5").setScale(1.3);
+                        this.barreDeVie.setInteractive();
+                        this.barreDeVie.setScrollFactor(0);
+
+                        this.barreDeVie.setDepth(1);
+
+                    }
+
+                    update(){
+
+                        console.log(this.variabledelamortquitue)
+                        if (this.variabledelamortquitue == 3) {
+                            this.scene.start('Gameover')
+                        }
+
+                        //if (gameOver){return;}
+
+                        if (this.cursors.left.isDown){ //si la touche gauche est appuyée
+                            this.player.setVelocityX(-160); //alors vitesse négative en X
+                            this.player.anims.play('left__', true); //et animation => gauche
+                            this.direction = 'left';
+                        }
+                        else if (this.cursors.right.isDown){ //sinon si la touche droite est appuyée
+                            this.player.setVelocityX(160); //alors vitesse positive en X
+                            this.player.anims.play('right__', true); //et animation => droite
+                            this.direction = 'right';
+                        }
+                        else{ // sinon
+                            this.player.setVelocityX(0); //vitesse nulle
+                            this.player.anims.play('turn__'); //animation fait face caméra
+                        }
+
+                        if (this.player.body.onFloor() && this.jump==true){
+                            
+                            this.nbSaut=2;
+                            this.jump=false;
+                            
+                        }
+
+                        if (Phaser.Input.Keyboard.JustDown(this.cursors.up) && this.nbSaut>0){
+                            //si touche haut appuyée ET que le perso touche le sol
+                            this.player.setVelocityY(-270);
+                            this.nbSaut=this.nbSaut-1;
+                            this.jump=true;
+                        }
+
+                        if (this.cursors.space.isDown && this.direction == 'left'){
+                            this.player.setVelocityX(0)
+                            this.attacking = true
+                            this.player.anims.play('left_attaque', true);
+                            setTimeout(() => {
+                                this.attacking = false
+                            }, 400);
+                        }
+
+                        if (this.cursors.space.isDown && this.direction == 'right'){
+                            this.player.setVelocityX(0)
+                            this.attacking = true
+                            this.player.anims.play('right_attaque', true);
+                            setTimeout(() => {
+                                this.attacking = false
+                            }, 400);
+                        }
+
+                        this.scoreText.setText('Score: ' + this.score)
+
+                        if (this.invincible == true){
+                            this.compteur --;
+                            if (this.compteur <= 0){
+                                this.invincible = false;
+                                this.compteur = 120;
+                                this.player.setTint(0xffffff);
+                            }
+                        }
+
+                    }
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                class Scene_loot extends Phaser.Scene {
+                    constructor() {
+                        super("Scene_loot")
+
+                        this.gameOver = false;
+                        this.vieJoueur;
+                        this.player;    
+                        this.nbSaut = 2;
+                        this.jump = false;
+
+                        this.Pieces;
+                        this.hache = false;
+                        this.powerUp_hache;
+                        this.fireOn = false;
+                        this.petiteclee;
+                        this.score = 0;
+                        this.scoreText;
+                        this.cursors;
+                        this.groupeBoule;
+                        this.barreDeVie;
+                        this.barreInventaire;
+                        this.grandeclee;
+                        this.coffre;
+                        this.petitecleecollectee = false;
+                        this.portetemple;
+                        this.grandecleecollectee = false;
+                        this.nombrecollide = 5;
+                        this.invincible = false;
+                        this.compteur = 120;
+                        this.invincibleMonstre = false
+                        this.compteurMonstre = 120;
+                        this.nombrecollideMonstre = 3;
+                        this.petitecleecollectee = false;
+                        this.plateforme_A_Direction = 0;
+                        this.couronnecollectee = false;
+                        this.plateforme_B_Direction = 0;
+                        
+                    }
+
+                    preload(){
+
+                        this.load.image("Phaser_tuilesdejeu", "Assets/ASSETS.png"); // Charger le png du tileset
+                        this.load.tilemapTiledJSON("carte__", "MAP_LOOT.json"); // Charger la map tiled
+
+                        this.load.spritesheet("Njord_hache", "Assets/Marche_hache.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.spritesheet('pieces', 'Assets/Piece.png', // Charger la pièce
+                        { frameWidth: 32, frameHeight: 32});
+
+                        this.load.image("Barre_inventaire_0", "Assets/Barre_i_1.png");
+                        this.load.image("Barre_inventaire_1", "Assets/Barre_i_2.png");
+                        this.load.image("Barre_inventaire_2", "Assets/Barre_i_3.png");
+                        this.load.image("Barre_inventaire_3", "Assets/Barre_i_4.png");
+                        this.load.image("Barre_inventaire_4", "Assets/Barre_i_5.png");
+                        this.load.image("Barre_inventaire_5", "Assets/Barre_i_6.png");
+
+                        this.load.image("Barre_PV_5", "Assets/Barre_vie_5.png");
+                        this.load.image("Barre_PV_4", "Assets/Barre_vie_4.png");
+                        this.load.image("Barre_PV_3", "Assets/Barre_vie_3.png");
+                        this.load.image("Barre_PV_2", "Assets/Barre_vie_2.png");
+                        this.load.image("Barre_PV_1", "Assets/Barre_vie_1.png");
+
+                        this.load.image("Sapin__colide", "Assets/Sapin__Colide.png");
+
+                        this.load.image("Couronne_", "Assets/Couronne__.png");
+
+                        this.load.image("Petite_Clee", "Assets/Petite_clee.png");
+
+                        this.load.image("Coffre_", "Assets/Coffre.png");
+
+                        this.load.image("Piques", "Assets/Pique__.png");
+
+                    }
+
+                    create(){
+
+                        this.variabledelamortquitue = 0
+
+                        this.carteDuNiveau = this.add.tilemap("carte__");
+
+
+                        // Importer les Tileset
+                        this.tileset = this.carteDuNiveau.addTilesetImage(
+                            "ASSETS",
+                            "Phaser_tuilesdejeu"
+                        );
+
+                        this.fond = this.carteDuNiveau.createLayer(
+                            "Fond",
+                            this.tileset
+                        );
+
+                        this.mur = this.carteDuNiveau.createLayer(
+                            "Mur",
+                            this.tileset
+                        );
+
+                        this.plateforme_a = this.carteDuNiveau.createLayer(
+                            "Plateforme_A",
+                            this.tileset
+                        );
+
+                        this.plateforme_b = this.carteDuNiveau.createLayer(
+                            "Plateforme_B",
+                            this.tileset
+                        );
+
+                        this.plateforme_c = this.carteDuNiveau.createLayer(
+                            "Plateforme_C",
+                            this.tileset
+                        );
+
+                        this.cristaux = this.carteDuNiveau.createLayer(
+                            "Cristaux",
+                            this.tileset
+                        );
+
+                        this.rochers_backside = this.carteDuNiveau.createLayer(
+                            "Rochers_backside",
+                            this.tileset
+                        );
+
+                        this.sol = this.carteDuNiveau.createLayer(
+                            "Sol",
+                            this.tileset
+                        );
+
+                        this.buissons = this.carteDuNiveau.createLayer(
+                            "Buissons",
+                            this.tileset
+                        );
+
+                        this.glace = this.carteDuNiveau.createLayer(
+                            "Glace",
+                            this.tileset
+                        );
+
+                        this.rochers = this.carteDuNiveau.createLayer(
+                            "Rochers",
+                            this.tileset
+                        );
+
+                        this.eau = this.carteDuNiveau.createLayer(
+                            "Eau",
+                            this.tileset
+                        );
+
+                        this.arbres = this.carteDuNiveau.createLayer(
+                            "Arbres",
+                            this.tileset
+                        );
+
+                        this.sapin_scene = this.carteDuNiveau.createLayer(
+                            "Sapin_scene",
+                            this.tileset
+                        );
+
+                        this.sapin = this.carteDuNiveau.createLayer(
+                            "Sapin",
+                            this.tileset
+                        );
+
+                        this.sapin_scene.setDepth(1);
+                        this.sapin.setDepth(1);
+                        this.eau.setDepth(1);
+
+                        this.mur.setCollisionByProperty({ estSolide: true });
+                        this.sapin.setCollisionByProperty({ estSolide: true });
+                        this.sol.setCollisionByProperty({ estSolide: true });
+                        this.glace.setCollisionByProperty({ estSolide: true });
+                        this.sapin_scene.setCollisionByProperty({ estSolide: true });
+                        this.plateforme_a.setCollisionByProperty({ estSolide: true });
+                        this.plateforme_b.setCollisionByProperty({ estSolide: true });
+                        this.plateforme_c.setCollisionByProperty({ estSolide: true });
+
+                        this.cameras.main.setBounds(0, 352, 2816, 672);
+                        this.physics.world.setBounds(0, 352, 2816, 672); 
+                        this.cameras.main.zoom = 2;
+
+                        this.player = this.physics.add.sprite(224, 700, 'Njord_hache');
+
+                        this.cameras.main.startFollow(this.player);
+
+                        this.cursors = this.input.keyboard.createCursorKeys();
+
+                        this.physics.add.collider(this.player, this.mur);
+                        this.physics.add.collider(this.player, this.sapin);
+                        this.physics.add.collider(this.player, this.sol);
+                        this.physics.add.collider(this.player, this.piques);
+                        this.physics.add.collider(this.player, this.glace);
+                        this.physics.add.collider(this.player, this.sapin_scene);
+                        this.physics.add.collider(this.player, this.plateforme_a);
+                        this.physics.add.collider(this.player, this.plateforme_b);
+                        this.physics.add.collider(this.player, this.plateforme_c);
+
+                        this.player.setCollideWorldBounds(true);
+
+                        this.anims.create({
+                            key: 'left_',
+                            frames: this.anims.generateFrameNumbers('Njord_hache', {start:3,end:0}),
+                            frameRate: 10,
+                            repeat: -1
+                            });
+                            this.anims.create({
+                            key: 'turn_',
+                            frames: [ { key: 'Njord_hache', frame: 4 } ],
+                            frameRate: 20
+                            });
+                            this.anims.create({
+                            key: 'right_',
+                            frames: this.anims.generateFrameNumbers('Njord_hache', {start:5,end:8}),
+                            frameRate: 10,
+                            repeat: -1
+                        });
+
+                        this.anims.create({
+                        key: 'tourner',
+                        frames: this.anims.generateFrameNumbers('pieces', {start:0,end:5}),
+                        frameRate: 10,
+                        repeat: -1
+                        });
+
+                        this.coins = this.physics.add.group({ 
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.eau_mal = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.petite_clee = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.couronne = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.coffre = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.colide_sapin = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.piques = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Pieces').objects.forEach((pieces_) => {
+                            const pieceSprite = this.coins.create(pieces_.x, pieces_.y-32, 'pieces').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Sol_fond').objects.forEach((eau_) => {
+                            const botteSprite = this.eau_mal.create(eau_.x, eau_.y-32, 'Eau_Mal').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Coffre').objects.forEach((coffre_) => {
+                            const coffreSprite = this.coffre.create(coffre_.x, coffre_.y-32, 'Coffre_').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Petite_clee').objects.forEach((clee_) => {
+                            const petite_cleeSprite = this.petite_clee.create(clee_.x, clee_.y-32, 'Petite_Clee').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Passage_scene').objects.forEach((passage_) => {
+                            const petite_cleeSprite = this.colide_sapin.create(passage_.x, passage_.y-32, 'Colide_sapin').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Couronne').objects.forEach((couronne_) => {
+                            const couronneSprite = this.couronne.create(couronne_.x, couronne_.y-32, 'Couronne_').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Piques_').objects.forEach((piques_) => {
+                            const piquesSprite = this.piques.create(piques_.x, piques_.y-32, 'Piques').setOrigin(0);
+                        });
+
+                        this.physics.add.collider(this.player, this.coins, collectPiece, null, this);
+                        this.physics.add.collider(this.player, this.eau_mal, respawn__, null, this);
+                        this.physics.add.collider(this.player, this.petite_clee, collect_petite_clee, null, this);
+                        this.physics.add.collider(this.player, this.coffre, chest, null, this);
+                        this.physics.add.collider(this.player, this.couronne, collect_couronne, null, this);
+                        this.physics.add.collider(this.player, this.colide_sapin, Passage_Scene_3, null, this);
+                        this.physics.add.collider(this.player, this.piques, vieHeros, null, this);
+
+                        this.coins.playAnimation('tourner');
+
+                        this.scoreText=this.add.text(400,200,'Score: 0',{fontSize:'32px',fill:'#000'}); // Affichage du score du joueur
+                        this.scoreText.setScrollFactor(0); // Affiche un texte à l’écran, pour le score
+
+                        this.score = 0;
+
+                        this.barreInventaire = this.add.image(1035, 530,'Barre_inventaire_2').setScale(1.5);
+                        this.barreInventaire.setInteractive();
+                        this.barreInventaire.setScrollFactor(0);
+
+                        this.barreInventaire.setDepth(1);
+
+                        this.barreDeVie = this.add.image(485, 530, "Barre_PV_5").setScale(1.3);
+                        this.barreDeVie.setInteractive();
+                        this.barreDeVie.setScrollFactor(0);
+
+                        this.barreDeVie.setDepth(1);
+
+                    }
+
+                    update(){
+
+                        console.log(this.variabledelamortquitue)
+                        if (this.variabledelamortquitue == 3) {
+                            this.scene.start('Gameover')
+                        }
+
+                        //if (gameOver){return;}
+
+                        if (this.cursors.left.isDown){ //si la touche gauche est appuyée
+                            this.player.setVelocityX(-160); //alors vitesse négative en X
+                            this.player.anims.play('left_', true); //et animation => gauche
+                        }
+                        else if (this.cursors.right.isDown){ //sinon si la touche droite est appuyée
+                            this.player.setVelocityX(160); //alors vitesse positive en X
+                            this.player.anims.play('right_', true); //et animation => droite
+                        }
+                        else{ // sinon
+                            this.player.setVelocityX(0); //vitesse nulle
+                            this.player.anims.play('turn_'); //animation fait face caméra
+                        }
+
+                        if (this.player.body.onFloor() && this.jump==true){
+                            
+                            this.nbSaut=2;
+                            this.jump=false;
+                            
+                        }
+
+                        if (Phaser.Input.Keyboard.JustDown(this.cursors.up) && this.nbSaut>0){
+                            //si touche haut appuyée ET que le perso touche le sol
+                            this.player.setVelocityY(-270);
+                            this.nbSaut=this.nbSaut-1;
+                            this.jump=true;
+                        }
+
+                  
+                        if (this.plateforme_A_Direction == 0){
+                            this.plateforme_a.y = this.plateforme_a.y + 1
+                            if (this.plateforme_a.y >= 600){
+                                this.plateforme_A_Direction = 1
+                            }
+                        }
+
+                        else if (this.plateforme_A_Direction == 1){
+                            this.plateforme_a.y = this.plateforme_a.y - 1
+                            if (this.plateforme_a.y <= 350 ){
+                                this.plateforme_A_Direction = 0
+                            }
+                        }   
+
+                        this.scoreText.setText('Score: ' + this.score)
+
+                        if (this.invincible == true){
+                            this.compteur --;
+                            if (this.compteur <= 0){
+                                this.invincible = false;
+                                this.compteur = 120;
+                                this.player.setTint(0xffffff);
+                            }
+                        }
+
+                        if (this.plateforme_B_Direction == 0){
+                            this.plateforme_b.y = this.plateforme_b.y + 1
+                            if (this.plateforme_b.y >= 600){
+                                this.plateforme_B_Direction = 1
+                            }
+                        }
+
+                        else if (this.plateforme_B_Direction == 1){
+                            this.plateforme_b.y = this.plateforme_b.y - 1
+                            if (this.plateforme_b.y <= 350 ){
+                                this.plateforme_B_Direction = 0
+                            }
+                        }   
+
+                        this.scoreText.setText('Score: ' + this.score)
+
+                        if (this.invincible == true){
+                            this.compteur --;
+                            if (this.compteur <= 0){
+                                this.invincible = false;
+                                this.compteur = 120;
+                                this.player.setTint(0xffffff);
+                            }
+                        }
+
+                    }
+
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                class Scene_finale extends Phaser.Scene {
+                    constructor() {
+                        super("Scene_finale")
+
+                        this.gameOver = false;
+                        this.vieJoueur;
+                        this.player;    
+                        this.nbSaut = 2;
+                        this.jump = false;
+
+                        this.Pieces;
+                        this.hache = false;
+                        this.powerUp_hache;
+                        this.fireOn = false;
+                        this.petiteclee;
+                        this.score = 0;
+                        this.scoreText;
+                        this.cursors;
+                        this.groupeBoule;
+                        this.barreDeVie;
+                        this.barreInventaire;
+                        this.grandeclee;
+                        this.coffre;
+                        this.petitecleecollectee = false;
+                        this.portetemple;
+                        this.grandecleecollectee = false;
+                        this.nombrecollide = 5;
+                        this.invincible = false;
+                        this.compteur = 120;
+                        this.invincibleMonstre = false
+                        this.compteurMonstre = 120;
+                        this.nombrecollideMonstre = 3;
+                        this.foudrecollectee = false;
+                        
+                    }
+
+                    preload(){
+
+                        this.load.image("Phaser_tuilesdejeu", "Assets/ASSETS.png"); // Charger le png du tileset
+                        this.load.tilemapTiledJSON("carte___", "MAP_FINAL.json"); // Charger la map tiled
+
+                        this.load.spritesheet("Njord_hache", "Assets/Marche_hache.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.spritesheet("Njord_hache_electrique", "Assets/Marche_hache_electrique.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.spritesheet('pieces', 'Assets/Piece.png', // Charger la pièce
+                        { frameWidth: 32, frameHeight: 32});
+
+                        this.load.image("Barre_inventaire_0", "Assets/Barre_i_1.png");
+                        this.load.image("Barre_inventaire_1", "Assets/Barre_i_2.png");
+                        this.load.image("Barre_inventaire_2", "Assets/Barre_i_3.png");
+                        this.load.image("Barre_inventaire_3", "Assets/Barre_i_4.png");
+                        this.load.image("Barre_inventaire_4", "Assets/Barre_i_5.png");
+                        this.load.image("Barre_inventaire_5", "Assets/Barre_i_6.png");
+
+                        this.load.image("Barre_PV_5", "Assets/Barre_vie_5.png");
+                        this.load.image("Barre_PV_4", "Assets/Barre_vie_4.png");
+                        this.load.image("Barre_PV_3", "Assets/Barre_vie_3.png");
+                        this.load.image("Barre_PV_2", "Assets/Barre_vie_2.png");
+                        this.load.image("Barre_PV_1", "Assets/Barre_vie_1.png");
+
+                        this.load.image("Sapin_colide", "Assets/Sapin__Colide.png");
+
+                        this.load.image("Eau_Mal", "Assets/Eau_collide.png");
+
+                        this.load.image("Porte_Valhalla", "Assets/Porte_Valhalla_.png");
+
+                        this.load.image("Powerup_Foudre", "Assets/Power_up_foudre.png");
+
+                        this.load.spritesheet('Thor', 'Assets/Thor__.png', 
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.image("SpriteDialogueThor_", "Assets/SpriteDialogueThor.png");
+
+                        this.load.image("Piques", "Assets/Pique__.png");
+
+                    }
+
+                    create(){
+
+                        this.variabledelamortquitue = 0
+
+                        this.carteDuNiveau = this.add.tilemap("carte___");
+                        
+
+                        // Importer les Tileset
+                        this.tileset = this.carteDuNiveau.addTilesetImage(
+                            "ASSETS",
+                            "Phaser_tuilesdejeu"
+                        );
+
+                        this.fond = this.carteDuNiveau.createLayer(
+                            "Fond",
+                            this.tileset
+                        );
+
+                        this.colide = this.carteDuNiveau.createLayer(
+                            "Colide",
+                            this.tileset
+                        );
+
+                        this.eau = this.carteDuNiveau.createLayer(
+                            "Eau",
+                            this.tileset
+                        );
+
+                        this.no_colide = this.carteDuNiveau.createLayer(
+                            "No_colide",
+                            this.tileset
+                        );
+                        
+
+                        this.eau.setDepth(1);
+
+                        this.colide.setCollisionByProperty({ estSolide: true });
+
+                        this.cameras.main.setBounds(-500, 352, 2912, 672);
+                        this.physics.world.setBounds(-500, 352, 2912, 672); 
+                        this.cameras.main.zoom = 2;
+
+                        this.player = this.physics.add.sprite(-240, 670, 'Njord_hache');
+                        this.thor = this.physics.add.sprite(2000, 456, 'Thor')
+                        this.thor.body.allowGravity = false
+                        this.SpriteDialogueThor = this.physics.add.sprite(2000, 410, 'SpriteDialogueThor_').setScale(0.8)
+                        this.SpriteDialogueThor.body.allowGravity = false
+                        this.SpriteDialogueThor.visible = false
+
+                        this.cameras.main.startFollow(this.player);
+
+                        this.cursors = this.input.keyboard.createCursorKeys();
+
+                        this.physics.add.collider(this.player, this.colide);
+
+                        this.player.setCollideWorldBounds(true);
+
+                        this.anims.create({
+                            key: 'left__',
+                            frames: this.anims.generateFrameNumbers('Njord_hache', {start:3,end:0}),
+                            frameRate: 10,
+                            repeat: -1
+                            });
+                            this.anims.create({
+                            key: 'turn__',
+                            frames: [ { key: 'Njord_hache', frame: 4 } ],
+                            frameRate: 20
+                            });
+                            this.anims.create({
+                            key: 'right__',
+                            frames: this.anims.generateFrameNumbers('Njord_hache', {start:5,end:8}),
+                            frameRate: 10,
+                            repeat: -1
+                        });
+
+                        this.anims.create({
+                            key: 'left_foudre',
+                            frames: this.anims.generateFrameNumbers('Njord_hache_electrique', {start:3,end:0}),
+                            frameRate: 10,
+                            repeat: -1
+                            });
+                            this.anims.create({
+                            key: 'turn_foudre',
+                            frames: [ { key: 'Njord_hache_electrique', frame: 4 } ],
+                            frameRate: 20
+                            });
+                            this.anims.create({
+                            key: 'right_foudre',
+                            frames: this.anims.generateFrameNumbers('Njord_hache_electrique', {start:5,end:8}),
+                            frameRate: 10,
+                            repeat: -1
+                        });
+
+                        this.anims.create({
+                        key: 'tourner',
+                        frames: this.anims.generateFrameNumbers('pieces', {start:0,end:5}),
+                        frameRate: 10,
+                        repeat: -1
+                        });
+
+                        this.coins = this.physics.add.group({ 
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.eau_mal = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.valhalla = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.foudre = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.piques = this.physics.add.group({
+                            allowGravity: false,
+                            immovable: true
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Pieces').objects.forEach((pieces_) => {
+                            const pieceSprite = this.coins.create(pieces_.x, pieces_.y-32, 'pieces').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Sol_fond').objects.forEach((eau_) => {
+                            const eauSprite = this.eau_mal.create(eau_.x, eau_.y-32, 'Eau_Mal').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Porte_Valhalla').objects.forEach((porte_) => {
+                            const valhallaSprite = this.valhalla.create(porte_.x, porte_.y-32, 'Porte_Valhalla').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Foudre').objects.forEach((foudre_) => {
+                            const foudreSprite = this.foudre.create(foudre_.x, foudre_.y-32, 'Powerup_Foudre').setOrigin(0);
+                        });
+
+                        this.carteDuNiveau.getObjectLayer('Piques_').objects.forEach((piques_) => {
+                            const piquesSprite = this.piques.create(piques_.x, piques_.y-32, 'Piques').setOrigin(0);
+                        });
+
+                        this.physics.add.collider(this.player, this.coins, collectPiece, null, this);
+                        this.physics.add.collider(this.player, this.eau_mal, respawn___, null, this);
+                        this.physics.add.collider(this.player, this.valhalla, fin, null, this);
+                        this.physics.add.collider(this.player, this.foudre, collect_foudre, null, this);
+                        this.physics.add.collider(this.player, this.piques, vieHeros, null, this);
+                        
+
+                        this.coins.playAnimation('tourner');
+
+                        this.scoreText=this.add.text(400,200,'Score: 0',{fontSize:'32px',fill:'#000'}); // Affichage du score du joueur
+                        this.scoreText.setScrollFactor(0); // Affiche un texte à l’écran, pour le score
+
+                        this.score = 0;
+
+                        this.barreInventaire = this.add.image(1035, 530,'Barre_inventaire_2').setScale(1.5);
+                        this.barreInventaire.setInteractive();
+                        this.barreInventaire.setScrollFactor(0);
+
+                        this.barreInventaire.setDepth(1);
+
+                        this.barreDeVie = this.add.image(485, 530, "Barre_PV_5").setScale(1.3);
+                        this.barreDeVie.setInteractive();
+                        this.barreDeVie.setScrollFactor(0);
+
+                        this.barreDeVie.setDepth(1);
+
+                    }
+
+                    update(){
+
+                        console.log(this.variabledelamortquitue)
+                        if (this.variabledelamortquitue == 3) {
+                            this.scene.start('Gameover')
+                        }
+
+                        if(this.player.x >= 1800 && this.player.x >= 1900){
+
+                            this.SpriteDialogueThor.visible = true
+                        }
+                        else{
+
+                            this.SpriteDialogueThor.visible = false
+                        }
+
+                        //if (gameOver){return;}
+
+                        if (this.cursors.left.isDown && this.foudrecollectee == false){ //si la touche gauche est appuyée
+                            this.player.setVelocityX(-160); //alors vitesse négative en X
+                            this.player.anims.play('left__', true); //et animation => gauche
+                        }
+                        else if (this.cursors.left.isDown && this.foudrecollectee == true){ //si la touche gauche est appuyée
+                            this.player.setVelocityX(-160); //alors vitesse négative en X
+                            this.player.anims.play('left_foudre', true); //et animation => gauche
+                        }
+                        else if (this.cursors.right.isDown && this.foudrecollectee == false){ //sinon si la touche droite est appuyée
+                            this.player.setVelocityX(160); //alors vitesse positive en X
+                            this.player.anims.play('right__', true); //et animation => droite
+                        }
+                        else if (this.cursors.right.isDown && this.foudrecollectee == true){ //si la touche gauche est appuyée
+                            this.player.setVelocityX(160); //alors vitesse négative en X
+                            this.player.anims.play('right_foudre', true); //et animation => gauche
+                        }
+                        else if (this.foudrecollectee == false){ // sinon
+                            this.player.setVelocityX(0); //vitesse nulle
+                            this.player.anims.play('turn__'); //animation fait face caméra
+                        }
+                        else if (this.foudrecollectee == true){ // sinon
+                            this.player.setVelocityX(0); //vitesse nulle
+                            this.player.anims.play('turn_foudre'); //animation fait face caméra
+                        }
+
+                        if (this.player.body.onFloor() && this.jump==true){
+                            
+                            this.nbSaut=2;
+                            this.jump=false;
+                            
+                        }
+
+                        if (Phaser.Input.Keyboard.JustDown(this.cursors.up) && this.nbSaut>0){
+                            //si touche haut appuyée ET que le perso touche le sol
+                            this.player.setVelocityY(-270);
+                            this.nbSaut=this.nbSaut-1;
+                            this.jump=true;
+                        }
+
+                        this.scoreText.setText('Score: ' + this.score)
+
+                        if (this.invincible == true){
+                            this.compteur --;
+                            if (this.compteur <= 0){
+                                this.invincible = false;
+                                this.compteur = 120;
+                                this.player.setTint(0xffffff);
+                            }
+                        }
+
+                    }
+                }
+
+                class Gameover extends Phaser.Scene {
+                    constructor() {
+                        super("Gameover")
+                    }
+
+                    preload(){
+
+                        this.load.image("Gameover_screen", "Assets/ECRAN_de_DEFAITE.png"); // Charger l'image d'acceuil
+
+                    }
+
+                    create(){
+
+
+                        this.imageAcceuil = this.physics.add.staticGroup();
+                        this.imageAcceuil.create(750, 375, 'Gameover_screen').setScale(1); // Emplacement de l'image d'acceuil
+
+                        this.cursors = this.input.keyboard.createCursorKeys();
+                    }
+
+                    update(){
+
+                        if (this.cursors.space.isDown){ // En appyant sur la touche "espace"
+                        this.scene.start("Frolegatt"); // On passe de la scene de l'image d'acceuil à la scene "Plaine"
+                        }
+        
+                    }
+
+                }
+
+                class Victory extends Phaser.Scene {
+                    constructor() {
+                        super("Victory")
+                    }
+
+                    preload(){
+
+                        this.load.image("Victory_screen", "Assets/ECRAN_VICTOIRE.png"); // Charger l'image d'acceuil
+
+                    }
+
+                    create(){
+
+
+                        this.imageAcceuil = this.physics.add.staticGroup();
+                        this.imageAcceuil.create(750, 375, 'Victory_screen').setScale(0.45); // Emplacement de l'image d'acceuil
+
+                        this.cursors = this.input.keyboard.createCursorKeys();
+                    }
+
+                    update(){
+
+                        if (this.cursors.space.isDown){ // En appyant sur la touche "espace"
+                        this.scene.start("Frolegatt"); // On passe de la scene de l'image d'acceuil à la scene "Plaine"
+                        }
+                        
+                    }
+
+                }
+
+                function collectPiece (player, Pieces){
+                        
+                    Pieces.disableBody(true, true);
+                    player.scene.score += 1; // Augmente le score de 1
+                        
+                }
+
+                function collectHache(player, Hache){
+                        
+                    Hache.disableBody(true, true);
+                    this.hache = true;
+                    this.hache_Inventaire = this.add.image(1035, 530, 'Barre_inventaire_1').setScale(1.5);
+                    this.hache_Inventaire.setInteractive();
+                    this.hache_Inventaire.setScrollFactor(0);
+
+                    this.hache_Inventaire.setDepth(1);
+                }
+
+                function collectBotte(player, botte, botte_collectee){
+
+                    botte.disableBody(true, true);
+                    this.botte_collectee = true;
+                    this.botte_Inventaire = this.add.image(1035, 530, 'Barre_inventaire_2').setScale(1.5);
+                    this.botte_Inventaire.setInteractive();
+                    this.botte_Inventaire.setScrollFactor(0);
+
+                    this.botte_Inventaire.setDepth(1);
+
+                }
+
+                function collect_petite_clee (player, petite_clee){
+
+                    petite_clee.disableBody(true, true);
+                    this.petite_clee_Inventaire = this.add.image(1035, 530, 'Barre_inventaire_3').setScale(1.5);
+                    this.petite_clee_Inventaire.setInteractive();
+                    this.petite_clee_Inventaire.setScrollFactor(0);
+                    this.petitecleecollectee = true
+
+                    this.petite_clee_Inventaire.setDepth(1);
+
+                }
+
+                function collect_couronne (player, couronne){
+
+                    couronne.disableBody(true, true);
+                    this.couronne_Inventaire = this.add.image(1035, 530, 'Barre_inventaire_4').setScale(1.5);
+                    this.couronne_Inventaire.setInteractive();
+                    this.couronne_Inventaire.setScrollFactor(0);
+                    this.couronnecollectee = true
+
+                    this.couronne_Inventaire.setDepth(1);
+
+                }
+
+                function collect_foudre (player, foudre){
+
+                    foudre.disableBody(true, true);
+                    this.foudre_Inventaire = this.add.image(1035, 530, 'Barre_inventaire_5').setScale(1.5);
+                    this.foudre_Inventaire.setInteractive();
+                    this.foudre_Inventaire.setScrollFactor(0);
+                    this.foudrecollectee = true
+
+                    this.foudre_Inventaire.setDepth(1);
+
+                }
+
+                function chest(player, coffre) {
+
+                    if (this.petitecleecollectee == true && this.cursors.down.isDown) {
+
+                        coffre.destroy();
+                    }
+                }
+
+                function vieHeros (player,vieJoueur,barreDeVie){
+
+                    if (this.invincible == false){
+                        this.nombrecollide -=1;
+                        player.setTint(0xff0000);
+                        this.invincible = true
+                    }
+
+                    if (this.nombrecollide == 4){
+                        this.barreDeVie.setTexture("Barre_PV_4");
+                        this.barreDeVie.setInteractive();
+                        this.barreDeVie.setScrollFactor(0);
+                    }
+
+                    if (this.nombrecollide == 3){
+                        this.barreDeVie.setTexture("Barre_PV_3");
+                        this.barreDeVie.setInteractive();
+                        this.barreDeVie.setScrollFactor(0);
+                    }
+
+                    if (this.nombrecollide == 2){
+                        this.barreDeVie.setTexture("Barre_PV_2");
+                        this.barreDeVie.setInteractive();
+                        this.barreDeVie.setScrollFactor(0);
+                    }
+
+                    if (this.nombrecollide == 1){
+                        this.barreDeVie.setTexture("Barre_PV_1");
+                        this.barreDeVie.setInteractive();
+                        this.barreDeVie.setScrollFactor(0);
+                    }
+
+                    if (this.nombrecollide <= 0){
+                        this.scene.start("Gameover");
+                    }
+                }
+
+                function respawn (player){
+
+                    this.player.x = 64
+                    this.player.y = 380
+                    this.variabledelamortquitue += 1
+
+                }
+
+                function respawn_ (player){
+
+                    this.player.x = 352
+                    this.player.y = 500
+                    this.variabledelamortquitue += 1
+
+                }
+
+                function respawn__ (player){
+
+                    this.player.x = 224
+                    this.player.y = 700
+                    this.variabledelamortquitue += 1
+
+                }
+
+                function respawn___ (player){
+
+                    this.player.x = -240
+                    this.player.y =  670
+                    this.variabledelamortquitue += 1
+
+                }
+
+                function Passage_Scene_1(player, sapin_colide){
+
+                    this.scene.start("Scene_ennemis",{x:100,y:100});
+
+                }
+
+                function Passage_Scene_2(player, sapin_collide){
+
+                    this.scene.start("Scene_loot",{x:100,y:100});
+
+                }
+
+                function Passage_Scene_3(player, colide_sapin){
+
+                    this.scene.start("Scene_finale",{x:100,y:100});
+
+                }
+
+                function fin (player){
+
+                    this.scene.start('Victory');
+
+                }
+
+                    var config = {
+                                pixelArt: true,
+                                type: Phaser.AUTO,
+                                width: 1500,
+                                height: 750,
+                                physics: {
+                                    default: 'arcade',
+                                    arcade: {
+                                        gravity: {y: 500},
+                                        debug: true
+                                    }
+                                },
+                                scene: [Acceuil,Frolegatt,Scene_ennemis,Scene_loot,Scene_finale,Victory,Gameover]
+                            };
+        
+                            new Phaser.Game(config);
+        </script>
+    </body>                     
+</html>
