@@ -59,7 +59,9 @@
                         this.powerUp_hache;
                         this.fireOn = false;
                         this.petiteclee;
-                        this.score = 0;
+                        if (!this.hasOwnProperty('score')) {
+                            this.score = this.Score;
+                        }
                         this.scoreText;
                         this.cursors;
                         this.groupeBoule;
@@ -77,6 +79,12 @@
                         this.compteurMonstre = 120;
                         this.nombrecollideMonstre = 3;
                         
+                    }
+
+                    init(data) {
+
+                        this.Score = data.score
+
                     }
                     
 
@@ -106,10 +114,15 @@
                         this.load.image("Barre_inventaire_5", "Assets/Barre_i_6.png");
 
                         this.load.image("Barre_PV_5", "Assets/Barre_vie_5.png");
+                        this.load.image("SpriteHealthbar45", "Assets/SpriteHealthbar45.png");
                         this.load.image("Barre_PV_4", "Assets/Barre_vie_4.png");
+                        this.load.image("SpriteHealthbar35", "Assets/SpriteHealthbar35.png");
                         this.load.image("Barre_PV_3", "Assets/Barre_vie_3.png");
+                        this.load.image("SpriteHealthbar25", "Assets/SpriteHealthbar25.png");
                         this.load.image("Barre_PV_2", "Assets/Barre_vie_2.png");
+                        this.load.image("SpriteHealthbar15", "Assets/SpriteHealthbar15.png");
                         this.load.image("Barre_PV_1", "Assets/Barre_vie_1.png");
+                        this.load.image("SpriteHealthbar05", "Assets/SpriteHealthbar05.png");
 
                         this.load.image("Sapin__colide", "Assets/Sapin_Colide.png");
 
@@ -122,9 +135,28 @@
                         this.load.spritesheet("Njord_Attaque", "Assets/Njord_attaque.png", // Charger le héros
                         { frameWidth: 32, frameHeight: 48});
 
+                        this.load.image("Bulle_deplacement", "Assets/Sprite_DEPLACEMENTS.png");
+
+                        this.load.image("Bulle_attaque", "Assets/Sprite_ATTAQUE.png");
+
+                        this.load.image("Bulle_double_saut", "Assets/Sprite_DOUBLE_SAUT.png");
+
+                        this.load.image("sky1", "Assets/SKY_1.png");
+
+                        this.load.image("sky2", "Assets/SKY_2.png");
+
                     }
 
                     create(){
+
+                        const sky_1 = this.add.image(1350, 128, 'sky1');
+                        sky_1.setScrollFactor(0.4, 1); 
+                        const sky2 = this.add.image(1000, 128, 'sky2');
+                        sky2.setScrollFactor(0.7, 1);
+
+                        if (typeof this.Score == 'undefined') {
+                            this.Score = 0;
+                        }
                         this.variabledelamortquitue = 0
 
                         
@@ -244,6 +276,18 @@
                         this.SpriteDialogue = this.physics.add.sprite(600, 320, 'SpriteDialogue').setScale(0.8)
                         this.SpriteDialogue.body.allowGravity = false
                         this.SpriteDialogue.visible = false
+
+                        this.SpriteDeplacement = this.physics.add.sprite(150, 320, 'Bulle_deplacement').setScale(0.8)
+                        this.SpriteDeplacement.body.allowGravity = false
+                        this.SpriteDeplacement.visible = false
+
+                        this.SpriteAttaque = this.physics.add.sprite(1400, 280, 'Bulle_attaque').setScale(0.8)
+                        this.SpriteAttaque.body.allowGravity = false
+                        this.SpriteAttaque.visible = false
+
+                        this.SpriteDoubleSaut = this.physics.add.sprite(1960, 120, 'Bulle_double_saut').setScale(0.8)
+                        this.SpriteDoubleSaut.body.allowGravity = false
+                        this.SpriteDoubleSaut.visible = false
 
                         this.cameras.main.startFollow(this.player);
 
@@ -409,7 +453,32 @@
                             this.SpriteDialogue.visible = false
                         }
 
-                        //if (gameOver){return;}
+                        if(this.player.x >= -120 && this.player.x >= 80){
+
+                        this.SpriteDeplacement.visible = true
+                        }
+                        else{
+
+                        this.SpriteDeplacement.visible = false
+                        }
+
+                        if(this.player.x >= 1250 && this.player.x >= 1350){
+
+                        this.SpriteAttaque.visible = true
+                        }
+                        else{
+
+                        this.SpriteAttaque.visible = false
+                        }
+
+                        if(this.player.x >= 1850 && this.player.x >= 1950){
+
+                        this.SpriteDoubleSaut.visible = true
+                        }
+                        else{
+
+                        this.SpriteDoubleSaut.visible = false
+                        }
 
                         if(this.attacking == true){return ; }
 
@@ -521,7 +590,9 @@
                         this.powerUp_hache;
                         this.fireOn = false;
                         this.petiteclee;
-                        this.score = 0;
+                        if (!this.hasOwnProperty('score')) {
+                            this.score = this.Score;
+                        }
                         this.scoreText;
                         this.cursors;
                         this.groupeBoule;
@@ -541,6 +612,12 @@
                         
                     }
 
+                    init(data) {
+
+                        this.Score = data.score
+
+                    }
+
                     preload(){
 
                         this.load.image("Phaser_tuilesdejeu", "Assets/ASSETS.png"); // Charger le png du tileset
@@ -555,6 +632,15 @@
                         this.load.spritesheet("Njord_Attaque", "Assets/Njord_attaque.png", // Charger le héros
                         { frameWidth: 32, frameHeight: 48});
 
+                        this.load.spritesheet("Spriteennemi", "Assets/Spriteennemi.png", // Charger l'ennemi
+                        { frameWidth: 64, frameHeight: 48});
+
+                        this.load.spritesheet("Spriteennemiarcher", "Assets/Spriteennemiarcher.png", // Charger l'ennemi
+                        { frameWidth: 48, frameHeight: 48});
+
+                        this.load.spritesheet("SpriteHealthbar", "Assets/SpriteHealthbar.png", // Charger l'ennemi
+                        { frameWidth: 128, frameHeight: 32});
+
                         this.load.image("Barre_inventaire_0", "Assets/Barre_i_1.png");
                         this.load.image("Barre_inventaire_1", "Assets/Barre_i_2.png");
                         this.load.image("Barre_inventaire_2", "Assets/Barre_i_3.png");
@@ -563,10 +649,22 @@
                         this.load.image("Barre_inventaire_5", "Assets/Barre_i_6.png");
 
                         this.load.image("Barre_PV_5", "Assets/Barre_vie_5.png");
+                        this.load.image("SpriteHealthbar45", "Assets/SpriteHealthbar45.png");
                         this.load.image("Barre_PV_4", "Assets/Barre_vie_4.png");
+                        this.load.image("SpriteHealthbar35", "Assets/SpriteHealthbar35.png");
                         this.load.image("Barre_PV_3", "Assets/Barre_vie_3.png");
+                        this.load.image("SpriteHealthbar25", "Assets/SpriteHealthbar25.png");
                         this.load.image("Barre_PV_2", "Assets/Barre_vie_2.png");
+                        this.load.image("SpriteHealthbar15", "Assets/SpriteHealthbar15.png");
                         this.load.image("Barre_PV_1", "Assets/Barre_vie_1.png");
+                        this.load.image("SpriteHealthbar05", "Assets/SpriteHealthbar05.png");
+
+                        //J'importe mon sprite invisible pour que mon ennemi m'attaque
+                        this.load.image("Spriteinvisible", "Assets/Spriteinvisible.png");
+                        this.load.image("Spriteattackennemi", "Assets/Spriteattackennemi.png");
+                        this.load.image("SpriteDeLaMort", "Assets/SpriteDeLaMort.png");
+                        this.load.image("SpriteFlecheRight", "Assets/SpriteFlecheRight.png");
+                        this.load.image("SpriteFlecheLeft", "Assets/SpriteFlecheLeft.png");
 
                         this.load.image("Sapin_colide", "Assets/Sapin__Colide.png");
 
@@ -574,13 +672,29 @@
 
                         this.load.image("Piques", "Assets/Pique__.png");
 
+                        this.load.image("sky1", "Assets/SKY_1.png");
+
+                        this.load.image("sky2", "Assets/SKY_2.png");
+
+                        this.load.image("Eau_collide_", "Assets/Eau_collide.png");
+
                     }
 
                     create(){
 
+                        const sky_1 = this.add.image(1350, 288, 'sky1');
+                        sky_1.setScrollFactor(0.4, 1); 
+                        const sky2 = this.add.image(1000, 288, 'sky2');
+                        sky2.setScrollFactor(0.7, 1);
+
                         this.variabledelamortquitue = 0
 
                         this.carteDuNiveau = this.add.tilemap("carte_");
+
+                        if (typeof this.Score == 'undefined') {
+                            this.Score = 0;
+                        }
+
                         
 
                         // Importer les Tileset
@@ -654,6 +768,27 @@
 
                         this.player = this.physics.add.sprite(352, 500, 'Njord_hache');
 
+                        this.ennemiarcher = this.physics.add.sprite(1125, 424, 'Spriteennemiarcher').setImmovable()
+                        this.ennemiarcher.body.allowGravity = false
+
+                        this.Spriteinvisiblearcher = this.physics.add.sprite(this.ennemiarcher.x, this.ennemiarcher.y, 'Spriteinvisible').setSize(160,48).setOffset(-82,0)
+                        this.Spriteinvisiblearcher.body.allowGravity = false
+
+                        this.ennemi = this.physics.add.sprite(727, 360, 'Spriteennemi').setImmovable()
+                        this.ennemi.body.allowGravity = false
+
+                        this.Spriteinvisible = this.physics.add.sprite(this.ennemi.x, this.ennemi.y, 'Spriteinvisible')
+                        this.Spriteinvisible.body.allowGravity = false
+
+                        this.Spriteattackennemi = this.physics.add.sprite(this.ennemi.x, this.ennemi.y, 'Spriteattackennemi')
+                        this.Spriteattackennemi.body.allowGravity = false
+
+                        this.SpriteDeLaMort = this.physics.add.sprite(0, 400, 'SpriteDeLaMort')
+                        this.SpriteDeLaMort.body.allowGravity = false
+
+                        this.Spriteattackpersonnage = this.physics.add.sprite(0, 400, 'SpriteDeLaMort')
+                        this.Spriteattackpersonnage.body.allowGravity = false
+
                         this.cameras.main.startFollow(this.player);
 
                         this.cursors = this.input.keyboard.createCursorKeys();
@@ -682,13 +817,60 @@
                             frameRate: 10,
                             repeat: -1
                         });
+                            this.anims.create({
+                            key: 'tourner',
+                            frames: this.anims.generateFrameNumbers('pieces', {start:0,end:5}),
+                            frameRate: 10,
+                            repeat: -1
+                        });
 
                         this.anims.create({
-                        key: 'tourner',
-                        frames: this.anims.generateFrameNumbers('pieces', {start:0,end:5}),
-                        frameRate: 10,
-                        repeat: -1
+                            key: 'ennemiright',
+                            frames: this.anims.generateFrameNumbers('Spriteennemi', {start:13,end:17}),
+                            frameRate: 8,
+                            repeat: -1
                         });
+                        this.anims.create({
+                            key: 'ennemileft',
+                            frames: this.anims.generateFrameNumbers('Spriteennemi', {start:8,end:12}),
+                            frameRate: 8,
+                            repeat: -1
+                        });
+                        this.anims.create({
+                            key: 'ennemiattackright',
+                            frames: this.anims.generateFrameNumbers('Spriteennemi', {start:4,end:7}),
+                            frameRate: 8,
+                            repeat: 0
+                        });
+                        this.anims.create({
+                            key: 'ennemiattackleft',
+                            frames: this.anims.generateFrameNumbers('Spriteennemi', {start:0,end:3}),
+                            frameRate: 8,
+                            repeat: 0
+                        });
+                        this.anims.create({
+                            key: 'ennemiarcherattackright',
+                            frames: this.anims.generateFrameNumbers('Spriteennemiarcher', {start:3,end:5}),
+                            frameRate: 8,
+                            repeat: 0
+                        });
+                        this.anims.create({
+                            key: 'ennemiarcherattackleft',
+                            frames: this.anims.generateFrameNumbers('Spriteennemiarcher', {start:0,end:2}),
+                            frameRate: 8,
+                            repeat: 0
+                        });
+                        this.anims.create({
+                            key: 'Healthbar4',
+                            frames: this.anims.generateFrameNumbers('SpriteHealthbar', {start:0,end:2}),
+                            frameRate: 8,
+                            repeat: 0
+                        });
+                        this.anims.create({
+                            key: 'turnennemi',
+                            frames: [ { key: 'Spriteennemi', frame: 8 } ],
+                            frameRate: 20
+                            });
 
                         this.anims.create({
                         key: 'left_attaque',
@@ -738,10 +920,17 @@
                             const piquesSprite = this.piques.create(piques_.x, piques_.y-32, 'Piques').setOrigin(0);
                         });
 
+                        this.physics.add.collider(this.SpriteDeLaMort, this.sol);
                         this.physics.add.collider(this.player, this.coins, collectPiece, null, this);
                         this.physics.add.overlap(this.player, this.sapin_collide, Passage_Scene_2, null, this);
                         this.physics.add.collider(this.player, this.eau_mal, respawn_, null, this);
                         this.physics.add.collider(this.player, this.piques, vieHeros, null, this);
+                        this.physics.add.collider(this.player, this.SpriteDeLaMort, vieHeros, null, this);
+                        this.physics.add.overlap(this.Spriteattackpersonnage, this.ennemi, this.EnnemiHit, null, this);
+                        this.physics.add.overlap(this.Spriteattackpersonnage, this.ennemiarcher, this.EnnemiHit2, null, this);
+                        this.physics.add.overlap(this.player, this.Spriteinvisible, this.EnnemiFocus, null, this);
+                        this.physics.add.overlap(this.player, this.Spriteinvisiblearcher, this.ArcherAttackLeft, null, this);
+                        this.physics.add.overlap(this.player, this.Spriteattackennemi, this.EnnemiAttack, null, this);
 
                         this.coins.playAnimation('tourner');
 
@@ -749,6 +938,14 @@
                         this.scoreText.setScrollFactor(0); // Affiche un texte à l’écran, pour le score
 
                         this.score = 0;
+                        this.hpennemi = 2;
+                        this.hparcher = 2;
+                        this.compteur1 = 60;
+                        this.compteur2 = 60;
+                        this.invincible1 = false;
+                        this.invincible2 = false;
+                        this.ennemiattacking = false;
+                        this.archerattacking = false;
 
                         this.barreInventaire = this.add.image(1035, 530,'Barre_inventaire_2').setScale(1.5);
                         this.barreInventaire.setInteractive();
@@ -764,12 +961,154 @@
 
                     }
 
-                    update(){
+                    EnnemiHit(Spriteattackpersonnage, ennemi){
+                            ennemi.setTint(0xff0000);
+                            if (!ennemi.invincible1){
+                                ennemi.invincible1 = true;
+                                if (this.hpennemi == 2){
+                                    console.log("Mon ennemi perd 1 hp")
+                                    ennemi.scene.hpennemi -= 1;
+                                }
+                                else if (this.hpennemi == 1){
+                                    console.log("J'ai tuer le premier ennemi")
+                                    ennemi.disableBody(true, true)
+                                    this.Spriteattackennemi.x = 0
+                        }}
+                        
+                    }
 
-                        console.log(this.variabledelamortquitue)
+                    EnnemiHit2(Spriteattackpersonnage, ennemiarcher){
+                            ennemiarcher.setTint(0xff0000);
+                            if (!ennemiarcher.invincible2){
+                                ennemiarcher.invincible2 = true;
+                                if (this.hparcher == 2){
+                                    ennemiarcher.scene.hparcher -= 1;
+                                }
+                                else if (this.hparcher == 1){
+                                    ennemiarcher.disableBody(true, true)
+                                    this.Spriteattackennemi.x = 0
+                        }}
+                        
+                    }
+
+                    ArcherAttackLeft(player, Spriteinvisiblearcher){
+                        if(this.player.x < this.ennemiarcher.x && this.archerattacking == false ){
+                        this.archerattacking = true
+                        this.ennemiarcher.anims.play('ennemiarcherattackleft', true)
+                        this.ennemiarcher.on('animationcomplete', () => {
+                                this.FlecheLeft = this.physics.add.sprite(this.ennemiarcher.x - 10, this.ennemiarcher.y, 'SpriteFlecheLeft').setSize(32, 3).setOffset(0, 15)
+                                this.FlecheLeft.body.allowGravity = false
+                                this.FlecheLeft.setVelocityX(-190)
+                                this.physics.add.overlap(this.player, this.FlecheLeft, vieHeros, null, this);
+                                this.sleep(3000).then(() => {
+                                    this.FlecheLeft.disableBody(true, true)
+                                    this.archerattacking = false
+                            })})
+                    }}
+
+                    EnnemiAttack(player, Spriteattackennemi){
+                        this.ennemiattacking = true
+                        if(this.player.x >= this.ennemi.x){
+                            this.ennemi.setVelocityX(0)
+                            this.ennemi.anims.play('ennemiattackright', true)
+                            this.sleep(20).then(() => {
+                                this.SpriteDeLaMort.x = this.ennemi.x + 32
+                                this.SpriteDeLaMort.y = this.ennemi.y
+                                this.sleep(1000).then(() => {
+                                    this.SpriteDeLaMort.x = 0
+                                    this.SpriteDeLaMort.y = 400
+                                })
+                                this.sleep(500).then(() => {
+                                    this.ennemi.on('animationcomplete', () => {
+                                this.ennemiattacking = false
+                                this.ennemi.setVelocityX(50);
+                                this.ennemi.anims.play('ennemiright', true)
+                                })
+                                
+                            })
+                            
+                        })}
+                        else if(this.player.x <= this.ennemi.x){
+                            this.ennemi.setVelocityX(0)
+                            this.ennemi.anims.play('ennemiattackleft', true)
+                            this.sleep(20).then(() => {
+                                this.SpriteDeLaMort.x = this.ennemi.x - 32
+                                this.SpriteDeLaMort.y = this.ennemi.y
+                                this.sleep(1000).then(() => {
+                                    this.SpriteDeLaMort.x = 0
+                                    this.SpriteDeLaMort.y = 400
+                                })
+                                this.sleep(500).then(() => {
+                                    this.ennemi.on('animationcomplete', () => {
+                                this.ennemiattacking = false
+                                this.ennemi.setVelocityX(50);
+                                this.ennemi.anims.play('ennemiright', true)
+                                })
+                            })
+                        })
+                        }
+                        
+                    }
+                    EnnemiFocus(player, Spriteinvisible){
+                        if (this.ennemiattacking == false){
+                            if(this.player.x > this.ennemi.x){
+                            this.ennemi.setVelocityX(70)
+                            this.ennemi.body.setSize(35, 46).setOffset(0, 0)
+                            this.ennemi.anims.play('ennemiright', true)
+                        }
+                        else if(this.player.x < this.ennemi.x){
+                            this.ennemi.setVelocityX(-70)
+                            this.ennemi.body.setSize(35, 46).setOffset(29, 0)
+                            this.ennemi.anims.play('ennemileft', true)
+                        }}
+                    }
+                    
+
+                    update(){
+                        console.log(this.player.x)
+                        console.log(this.player.y)
+
+                        if (this.ennemi.invincible1){
+                            this.compteur1 -= 1;
+                            if (this.compteur1 == 0){
+                                this.ennemi.invincible1 = false;
+                                this.compteur1 = 60;
+                                this.ennemi.setTint(0xffffff);
+                        }}
+
+                        if (this.ennemiarcher.invincible2){
+                            this.compteur1 -= 1;
+                            if (this.compteur1 == 0){
+                                this.ennemiarcher.invincible2 = false;
+                                this.compteur1 = 60;
+                                this.ennemiarcher.setTint(0xffffff);
+                        }}
+
+                        if(this.ennemi.body.velocity.x > 0){
+                            this.Spriteinvisible.x = this.ennemi.x - 16
+                            this.Spriteattackennemi.x = this.ennemi.x - 16
+                        }
+                        if(this.ennemi.body.velocity.x < 0){
+                            this.Spriteinvisible.x = this.ennemi.x + 16
+                            this.Spriteattackennemi.x = this.ennemi.x + 16
+                        }
+                        if(this.ennemi.x <= 575){
+                            this.ennemi.setVelocityX(70)
+                            this.ennemi.body.setSize(35, 46).setOffset(0, 0)
+                            this.ennemi.anims.play('ennemiright', true)
+                        }
+                        if(this.ennemi.x >= 727){
+                            this.ennemi.setVelocityX(-70)
+                            this.ennemi.body.setSize(35, 46).setOffset(29, 0)
+                            this.ennemi.anims.play('ennemileft', true)
+                        }
+                        
+
                         if (this.variabledelamortquitue == 3) {
                             this.scene.start('Gameover')
                         }
+
+                        if(this.attacking == true){return ; }
 
                         //if (gameOver){return;}
 
@@ -806,8 +1145,12 @@
                             this.player.setVelocityX(0)
                             this.attacking = true
                             this.player.anims.play('left_attaque', true);
+                            this.Spriteattackpersonnage.x = this.player.x - 16
+                            this.Spriteattackpersonnage.y = this.player.y
                             setTimeout(() => {
                                 this.attacking = false
+                                this.Spriteattackpersonnage.x = 0
+                                this.Spriteattackpersonnage.y = 0
                             }, 400);
                         }
 
@@ -815,8 +1158,12 @@
                             this.player.setVelocityX(0)
                             this.attacking = true
                             this.player.anims.play('right_attaque', true);
+                            this.Spriteattackpersonnage.x = this.player.x + 16
+                            this.Spriteattackpersonnage.y = this.player.y
                             setTimeout(() => {
                                 this.attacking = false
+                                this.Spriteattackpersonnage.x = 0
+                                this.Spriteattackpersonnage.y = 0
                             }, 400);
                         }
 
@@ -832,7 +1179,14 @@
                         }
 
                     }
-                }
+                    sleep = (milliseconds) => {
+            return new Promise(resolve => setTimeout(resolve, milliseconds));
+        }
+                    }
+                   
+                
+                
+
 
 
 
@@ -863,13 +1217,17 @@
                         this.player;    
                         this.nbSaut = 2;
                         this.jump = false;
+                        this.attacking = false;
+                        this.direction = 'right';
 
                         this.Pieces;
                         this.hache = false;
                         this.powerUp_hache;
                         this.fireOn = false;
                         this.petiteclee;
-                        this.score = 0;
+                        if (!this.hasOwnProperty('score')) {
+                            this.score = this.Score;
+                        }
                         this.scoreText;
                         this.cursors;
                         this.groupeBoule;
@@ -893,6 +1251,12 @@
                         
                     }
 
+                    init(data) {
+
+                        this.Score = data.score
+
+                    }
+
                     preload(){
 
                         this.load.image("Phaser_tuilesdejeu", "Assets/ASSETS.png"); // Charger le png du tileset
@@ -904,6 +1268,9 @@
                         this.load.spritesheet('pieces', 'Assets/Piece.png', // Charger la pièce
                         { frameWidth: 32, frameHeight: 32});
 
+                        this.load.spritesheet("Njord_Attaque", "Assets/Njord_attaque.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
                         this.load.image("Barre_inventaire_0", "Assets/Barre_i_1.png");
                         this.load.image("Barre_inventaire_1", "Assets/Barre_i_2.png");
                         this.load.image("Barre_inventaire_2", "Assets/Barre_i_3.png");
@@ -912,12 +1279,17 @@
                         this.load.image("Barre_inventaire_5", "Assets/Barre_i_6.png");
 
                         this.load.image("Barre_PV_5", "Assets/Barre_vie_5.png");
+                        this.load.image("SpriteHealthbar45", "Assets/SpriteHealthbar45.png");
                         this.load.image("Barre_PV_4", "Assets/Barre_vie_4.png");
+                        this.load.image("SpriteHealthbar35", "Assets/SpriteHealthbar35.png");
                         this.load.image("Barre_PV_3", "Assets/Barre_vie_3.png");
+                        this.load.image("SpriteHealthbar25", "Assets/SpriteHealthbar25.png");
                         this.load.image("Barre_PV_2", "Assets/Barre_vie_2.png");
+                        this.load.image("SpriteHealthbar15", "Assets/SpriteHealthbar15.png");
                         this.load.image("Barre_PV_1", "Assets/Barre_vie_1.png");
+                        this.load.image("SpriteHealthbar05", "Assets/SpriteHealthbar05.png");
 
-                        this.load.image("Sapin__colide", "Assets/Sapin__Colide.png");
+                        this.load.image("Sapin__collide_", "Assets/Sapin__Colide.png");
 
                         this.load.image("Couronne_", "Assets/Couronne__.png");
 
@@ -927,13 +1299,31 @@
 
                         this.load.image("Piques", "Assets/Pique__.png");
 
+                        this.load.image("sky1", "Assets/SKY_1.png");
+
+                        this.load.image("sky2", "Assets/SKY_2.png");
+
+                        this.load.image("Sprite_OUVRIR", "Assets/Sprite_OUVRIR.png");
+
+                        this.load.image("Eau_collide_", "Assets/Eau_collide.png");
+
                     }
 
                     create(){
 
+                        const sky_1 = this.add.image(1350, 640, 'sky1');
+                        sky_1.setScrollFactor(0.4, 1); 
+                        const sky2 = this.add.image(1000, 640, 'sky2');
+                        sky2.setScrollFactor(0.7, 1);
+
                         this.variabledelamortquitue = 0
 
                         this.carteDuNiveau = this.add.tilemap("carte__");
+
+                        if (typeof this.Score == 'undefined') {
+                            this.Score = 0;
+                        }
+
 
 
                         // Importer les Tileset
@@ -1036,6 +1426,10 @@
 
                         this.player = this.physics.add.sprite(224, 700, 'Njord_hache');
 
+                        this.SpriteOuvrir = this.physics.add.sprite(944, 500, 'Sprite_OUVRIR').setScale(0.8)
+                        this.SpriteOuvrir.body.allowGravity = false
+                        this.SpriteOuvrir.visible = false
+
                         this.cameras.main.startFollow(this.player);
 
                         this.cursors = this.input.keyboard.createCursorKeys();
@@ -1075,6 +1469,18 @@
                         frames: this.anims.generateFrameNumbers('pieces', {start:0,end:5}),
                         frameRate: 10,
                         repeat: -1
+                        });
+
+                        this.anims.create({
+                        key: 'left_attaque',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque', {start:2,end:0}),
+                        frameRate: 10,
+                        });
+
+                        this.anims.create({
+                        key: 'right_attaque',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque', {start:3,end:5}),
+                        frameRate: 10,
                         });
 
                         this.coins = this.physics.add.group({ 
@@ -1117,7 +1523,7 @@
                         });
 
                         this.carteDuNiveau.getObjectLayer('Sol_fond').objects.forEach((eau_) => {
-                            const botteSprite = this.eau_mal.create(eau_.x, eau_.y-32, 'Eau_Mal').setOrigin(0);
+                            const eaumalSprite = this.eau_mal.create(eau_.x, eau_.y-32, 'Eau_collide_').setOrigin(0);
                         });
 
                         this.carteDuNiveau.getObjectLayer('Coffre').objects.forEach((coffre_) => {
@@ -1129,7 +1535,7 @@
                         });
 
                         this.carteDuNiveau.getObjectLayer('Passage_scene').objects.forEach((passage_) => {
-                            const petite_cleeSprite = this.colide_sapin.create(passage_.x, passage_.y-32, 'Colide_sapin').setOrigin(0);
+                            const colidesapinSprite = this.colide_sapin.create(passage_.x, passage_.y-32, 'Sapin__collide_').setOrigin(0);
                         });
 
                         this.carteDuNiveau.getObjectLayer('Couronne').objects.forEach((couronne_) => {
@@ -1167,24 +1573,41 @@
 
                         this.barreDeVie.setDepth(1);
 
+                        this.couronne.setAlpha(0)
+
                     }
 
                     update(){
+                        console.log(this.player.x)
+                        console.log(this.player.y)
 
                         console.log(this.variabledelamortquitue)
                         if (this.variabledelamortquitue == 3) {
                             this.scene.start('Gameover')
                         }
 
+                        if(this.player.x >= 850 && this.player.x >= 900){
+
+                        this.SpriteOuvrir.visible = true
+                        }
+                        else{
+
+                        this.SpriteOuvrir.visible = false
+                        }
+
+                        if(this.attacking == true){return ; }
+
                         //if (gameOver){return;}
 
                         if (this.cursors.left.isDown){ //si la touche gauche est appuyée
                             this.player.setVelocityX(-160); //alors vitesse négative en X
                             this.player.anims.play('left_', true); //et animation => gauche
+                            this.direction = 'left';
                         }
                         else if (this.cursors.right.isDown){ //sinon si la touche droite est appuyée
                             this.player.setVelocityX(160); //alors vitesse positive en X
                             this.player.anims.play('right_', true); //et animation => droite
+                            this.direction = 'right';
                         }
                         else{ // sinon
                             this.player.setVelocityX(0); //vitesse nulle
@@ -1205,6 +1628,23 @@
                             this.jump=true;
                         }
 
+                        if (this.cursors.space.isDown && this.direction == 'left'){
+                            this.player.setVelocityX(0)
+                            this.attacking = true
+                            this.player.anims.play('left_attaque', true);
+                            setTimeout(() => {
+                                this.attacking = false
+                            }, 400);
+                        }
+
+                        if (this.cursors.space.isDown && this.direction == 'right'){
+                            this.player.setVelocityX(0)
+                            this.attacking = true
+                            this.player.anims.play('right_attaque', true);
+                            setTimeout(() => {
+                                this.attacking = false
+                            }, 400);
+                        }
                   
                         if (this.plateforme_A_Direction == 0){
                             this.plateforme_a.y = this.plateforme_a.y + 1
@@ -1258,6 +1698,10 @@
 
                     }
 
+                    sleep = (milliseconds) => {
+                        return new Promise(resolve => setTimeout(resolve, milliseconds));
+                    }
+
                 }
 
 
@@ -1299,13 +1743,19 @@
                         this.player;    
                         this.nbSaut = 2;
                         this.jump = false;
+                        this.attacking = false;
+                        this.direction = 'right';
+                        this.attackingElectrique = false;
+                        this.directionElectrique = 'right_';
 
                         this.Pieces;
                         this.hache = false;
                         this.powerUp_hache;
                         this.fireOn = false;
                         this.petiteclee;
-                        this.score = 0;
+                        if (!this.hasOwnProperty('score')) {
+                            this.score = this.Score;
+                        }
                         this.scoreText;
                         this.cursors;
                         this.groupeBoule;
@@ -1324,6 +1774,12 @@
                         this.nombrecollideMonstre = 3;
                         this.foudrecollectee = false;
                         
+                    }
+
+                    init(data) {
+
+                        this.Score = data.score
+
                     }
 
                     preload(){
@@ -1348,10 +1804,15 @@
                         this.load.image("Barre_inventaire_5", "Assets/Barre_i_6.png");
 
                         this.load.image("Barre_PV_5", "Assets/Barre_vie_5.png");
+                        this.load.image("SpriteHealthbar45", "Assets/SpriteHealthbar45.png");
                         this.load.image("Barre_PV_4", "Assets/Barre_vie_4.png");
+                        this.load.image("SpriteHealthbar35", "Assets/SpriteHealthbar35.png");
                         this.load.image("Barre_PV_3", "Assets/Barre_vie_3.png");
+                        this.load.image("SpriteHealthbar25", "Assets/SpriteHealthbar25.png");
                         this.load.image("Barre_PV_2", "Assets/Barre_vie_2.png");
+                        this.load.image("SpriteHealthbar15", "Assets/SpriteHealthbar15.png");
                         this.load.image("Barre_PV_1", "Assets/Barre_vie_1.png");
+                        this.load.image("SpriteHealthbar05", "Assets/SpriteHealthbar05.png");
 
                         this.load.image("Sapin_colide", "Assets/Sapin__Colide.png");
 
@@ -1368,13 +1829,43 @@
 
                         this.load.image("Piques", "Assets/Pique__.png");
 
+                        this.load.spritesheet("Njord_Attaque", "Assets/Njord_attaque.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.spritesheet("Njord_Attaque_Electrique", "Assets/Njord_attaque_electrique.png", // Charger le héros
+                        { frameWidth: 32, frameHeight: 48});
+
+                        this.load.image("sky1", "Assets/SKY_1.png");
+
+                        this.load.image("sky2", "Assets/SKY_2.png");
+
+                        this.load.image("Sprite_title_aratroth", "Assets/Sprite_TITLE_ARATROTH.png");
+
+                        //J'importe mon sprite invisible pour que mon ennemi m'attaque
+                        this.load.image("Spriteinvisible", "Assets/Spriteinvisible.png");
+                        this.load.image("Spriteattackennemi", "Assets/Spriteattackennemi.png");
+                        this.load.image("SpriteDeLaMort", "Assets/SpriteDeLaMort.png");
+
+                        this.load.spritesheet("Sprite_Aratroth", "Assets/Sprite_ARATROTH.png", // Charger l'ennemi
+                        { frameWidth: 64, frameHeight: 48});
+
                     }
 
                     create(){
 
+                        const sky_1 = this.add.image(1350, 640, 'sky1');
+                        sky_1.setScrollFactor(0.4, 1); 
+                        const sky2 = this.add.image(1000, 640, 'sky2');
+                        sky2.setScrollFactor(0.7, 1);
+
                         this.variabledelamortquitue = 0
 
                         this.carteDuNiveau = this.add.tilemap("carte___");
+
+                        if (typeof this.Score == 'undefined') {
+                            this.Score = 0;
+                        }
+
                         
 
                         // Importer les Tileset
@@ -1402,9 +1893,15 @@
                             "No_colide",
                             this.tileset
                         );
+
+                        this.sapin = this.carteDuNiveau.createLayer(
+                            "Sapin",
+                            this.tileset
+                        );
                         
 
                         this.eau.setDepth(1);
+                        this.sapin.setDepth(1);
 
                         this.colide.setCollisionByProperty({ estSolide: true });
 
@@ -1413,11 +1910,32 @@
                         this.cameras.main.zoom = 2;
 
                         this.player = this.physics.add.sprite(-240, 670, 'Njord_hache');
+
                         this.thor = this.physics.add.sprite(2000, 456, 'Thor')
                         this.thor.body.allowGravity = false
+
                         this.SpriteDialogueThor = this.physics.add.sprite(2000, 410, 'SpriteDialogueThor_').setScale(0.8)
                         this.SpriteDialogueThor.body.allowGravity = false
                         this.SpriteDialogueThor.visible = false
+
+                        this.SpriteTitleAratroth = this.physics.add.sprite(1120, 400, 'Sprite_title_aratroth').setScale(0.8)
+                        this.SpriteTitleAratroth.body.allowGravity = false
+                        this.SpriteTitleAratroth.visible = false
+
+                        this.aratroth = this.physics.add.sprite(1224, 520, 'Sprite_Aratroth').setImmovable()
+                        this.aratroth.body.allowGravity = false
+
+                        this.Spriteattackennemi = this.physics.add.sprite(this.aratroth.x, this.aratroth.y, 'Spriteattackennemi')
+                        this.Spriteattackennemi.body.allowGravity = false
+
+                        this.SpriteDeLaMort = this.physics.add.sprite(0, 0, 'SpriteDeLaMort')
+                        this.SpriteDeLaMort.body.allowGravity = false
+
+                        this.Spriteattackpersonnage = this.physics.add.sprite(0, 400, 'SpriteDeLaMort')
+                        this.Spriteattackpersonnage.body.allowGravity = false
+
+                        this.Spriteinvisible = this.physics.add.sprite(this.aratroth.x, this.aratroth.y, 'Spriteinvisible')
+                        this.Spriteinvisible.body.allowGravity = false
 
                         this.cameras.main.startFollow(this.player);
 
@@ -1470,6 +1988,61 @@
                         repeat: -1
                         });
 
+                        this.anims.create({
+                        key: 'left_attaque',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque', {start:2,end:0}),
+                        frameRate: 10,
+                        });
+
+                        this.anims.create({
+                        key: 'right_attaque',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque', {start:3,end:5}),
+                        frameRate: 10,
+                        });
+
+                        this.anims.create({
+                        key: 'left_attaque_electrique',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque_Electrique', {start:2,end:0}),
+                        frameRate: 10,
+                        });
+
+                        this.anims.create({
+                        key: 'right_attaque_electrique',
+                        frames: this.anims.generateFrameNumbers('Njord_Attaque_Electrique', {start:3,end:5}),
+                        frameRate: 10,
+                        });
+
+                        this.anims.create({
+                            key: 'turnaratroth',
+                            frames: [ { key: 'Sprite_Aratroth', frame: 8 } ],
+                            frameRate: 20
+                            });
+
+                            this.anims.create({
+                            key: 'aratrothright',
+                            frames: this.anims.generateFrameNumbers('Sprite_Aratroth', {start:13,end:17}),
+                            frameRate: 8,
+                            repeat: -1
+                        });
+                        this.anims.create({
+                            key: 'aratrothleft',
+                            frames: this.anims.generateFrameNumbers('Sprite_Aratroth', {start:8,end:12}),
+                            frameRate: 8,
+                            repeat: -1
+                        });
+                        this.anims.create({
+                            key: 'aratrothattackright',
+                            frames: this.anims.generateFrameNumbers('Sprite_Aratroth', {start:4,end:7}),
+                            frameRate: 8,
+                            repeat: 0
+                        });
+                        this.anims.create({
+                            key: 'aratrothattackleft',
+                            frames: this.anims.generateFrameNumbers('Sprite_Aratroth', {start:0,end:3}),
+                            frameRate: 8,
+                            repeat: 0
+                        });
+
                         this.coins = this.physics.add.group({ 
                             allowGravity: false,
                             immovable: true
@@ -1520,6 +2093,10 @@
                         this.physics.add.collider(this.player, this.valhalla, fin, null, this);
                         this.physics.add.collider(this.player, this.foudre, collect_foudre, null, this);
                         this.physics.add.collider(this.player, this.piques, vieHeros, null, this);
+                        this.physics.add.collider(this.player, this.SpriteDeLaMort, vieHeros, null, this);
+                        this.physics.add.overlap(this.Spriteattackpersonnage, this.aratroth, this.EnnemiHit, null, this);
+                        this.physics.add.overlap(this.player, this.Spriteinvisible, this.EnnemiFocus, null, this);
+                        this.physics.add.overlap(this.player, this.Spriteattackennemi, this.EnnemiAttack, null, this);
                         
 
                         this.coins.playAnimation('tourner');
@@ -1528,6 +2105,10 @@
                         this.scoreText.setScrollFactor(0); // Affiche un texte à l’écran, pour le score
 
                         this.score = 0;
+                        this.hparatroth = 5;
+                        this.compteur1 = 60;
+                        this.invincible1 = false;
+                        this.aratrothattacking = false;
 
                         this.barreInventaire = this.add.image(1035, 530,'Barre_inventaire_2').setScale(1.5);
                         this.barreInventaire.setInteractive();
@@ -1543,11 +2124,101 @@
 
                     }
 
+                    EnnemiHit(Spriteattackpersonnage, aratroth){
+                            aratroth.setTint(0xff0000);
+                            if (!aratroth.invincible1){
+                                aratroth.invincible1 = true;
+                                if (this.hparatroth == 5){
+                                    aratroth.scene.hparatroth -= 1;
+                                }
+                                else if (this.hparatroth == 4){
+                                    aratroth.scene.hparatroth -= 1;
+                                }
+                                else if (this.hparatroth == 3){
+                                    aratroth.scene.hparatroth -= 1;
+                                }
+                                else if (this.hparatroth == 2){
+                                    aratroth.scene.hparatroth -= 1;
+                                }
+                                else if (this.hparatroth == 1){
+                                    aratroth.disableBody(true, true)
+                                    this.Spriteattackennemi.x = 0
+                    }}}
+
+                    EnnemiAttack(player, Spriteattackennemi){
+                        this.aratrothattacking = true
+                        if(this.player.x >= this.aratroth.x){
+                            this.aratroth.setVelocityX(0)
+                            this.aratroth.anims.play('aratrothattackright', true)
+                            this.sleep(20).then(() => {
+                                
+                                this.SpriteDeLaMort.x = this.aratroth.x + 32
+                                this.SpriteDeLaMort.y = this.aratroth.y
+                                this.sleep(1000).then(() => {
+                                    this.SpriteDeLaMort.x = 0
+                                    this.SpriteDeLaMort.y = 400
+                                    this.aratroth.on('animationcomplete', () => {
+                                this.aratrothattacking = false
+                                this.aratroth.setVelocityX(50);
+                                this.aratroth.anims.play('aratrothright', true)
+
+                                })
+                            
+                                })
+                                
+                            })
+                            
+                        }
+                        else if(this.player.x <= this.aratroth.x){
+                            this.aratroth.setVelocityX(0)
+                            this.aratroth.anims.play('aratrothattackleft', true)
+                            this.sleep(20).then(() => {
+                               
+                                this.SpriteDeLaMort.x = this.aratroth.x - 32
+                                this.SpriteDeLaMort.y = this.aratroth.y
+                                this.sleep(1000).then(() => {
+                                this.SpriteDeLaMort.x = 0
+                                this.SpriteDeLaMort.y = 400
+                                this.aratroth.on('animationcomplete', () => {
+                                this.aratrothattacking = false
+                                this.aratroth.setVelocityX(50);
+                                this.aratroth.anims.play('aratrothright', true)
+                        })})})
+
+                    }}    
+                    
+
+                    EnnemiFocus(player, Spriteinvisible){
+                        if (this.aratrothattacking == false){
+                            if(this.player.x > this.aratroth.x){
+                            this.aratroth.setVelocityX(70)
+                            this.aratroth.body.setSize(35, 46).setOffset(0, 0)
+                            this.aratroth.anims.play('aratrothright', true)
+                        }}
+                        else if(this.player.x < this.aratroth.x){
+                            this.aratroth.setVelocityX(-70)
+                            this.aratroth.body.setSize(35, 46).setOffset(29, 0)
+                            this.aratroth.anims.play('aratrothleft', true)
+                        }}
+                    
+
+
                     update(){
+                        console.log(this.player.x)
+                        console.log(this.player.y)
 
                         console.log(this.variabledelamortquitue)
                         if (this.variabledelamortquitue == 3) {
                             this.scene.start('Gameover')
+                        }
+
+                        if(this.player.x >= 850 && this.player.x >= 900){
+
+                        this.SpriteTitleAratroth.visible = true
+                        }
+                        else{
+
+                        this.SpriteTitleAratroth.visible = false
                         }
 
                         if(this.player.x >= 1800 && this.player.x >= 1900){
@@ -1559,23 +2230,60 @@
                             this.SpriteDialogueThor.visible = false
                         }
 
-                        //if (gameOver){return;}
+
+
+                        if (this.aratroth.invincible1){
+                            this.compteur1 -= 1;
+                            if (this.compteur1 == 0){
+                                this.aratroth.invincible1 = false;
+                                this.compteur1 = 60;
+                                this.aratroth.setTint(0xffffff);
+                        }   }
+
+                        if(this.aratroth.body.velocity.x > 0){
+                            this.Spriteinvisible.x = this.aratroth.x - 16
+                            this.Spriteattackennemi.x = this.aratroth.x - 16
+                        }
+                        if(this.aratroth.body.velocity.x < 0){
+                            this.Spriteinvisible.x = this.aratroth.x + 16
+                            this.Spriteattackennemi.x = this.aratroth.x + 16
+                        }
+                        if(this.aratroth.x <= 911){
+                            this.aratroth.setVelocityX(70)
+                            this.aratroth.body.setSize(35, 46).setOffset(0, 0)
+                            this.aratroth.anims.play('aratrothright', true)
+                        }
+                        if(this.aratroth.x >= 1330){
+                            this.aratroth.setVelocityX(-70)
+                            this.aratroth.body.setSize(35, 46).setOffset(29, 0)
+                            this.aratroth.anims.play('aratrothleft', true)
+                        }
+
+
+
+                        if(this.attacking == true){return ; }
+                        if(this.attackingElectrique == true){return ; }
+
 
                         if (this.cursors.left.isDown && this.foudrecollectee == false){ //si la touche gauche est appuyée
                             this.player.setVelocityX(-160); //alors vitesse négative en X
                             this.player.anims.play('left__', true); //et animation => gauche
+                            this.direction = 'left';
                         }
                         else if (this.cursors.left.isDown && this.foudrecollectee == true){ //si la touche gauche est appuyée
                             this.player.setVelocityX(-160); //alors vitesse négative en X
                             this.player.anims.play('left_foudre', true); //et animation => gauche
+                            this.direction = 'left'
                         }
                         else if (this.cursors.right.isDown && this.foudrecollectee == false){ //sinon si la touche droite est appuyée
                             this.player.setVelocityX(160); //alors vitesse positive en X
                             this.player.anims.play('right__', true); //et animation => droite
+                            this.direction = 'right';
                         }
                         else if (this.cursors.right.isDown && this.foudrecollectee == true){ //si la touche gauche est appuyée
                             this.player.setVelocityX(160); //alors vitesse négative en X
                             this.player.anims.play('right_foudre', true); //et animation => gauche
+                            this.direction = 'right'
                         }
                         else if (this.foudrecollectee == false){ // sinon
                             this.player.setVelocityX(0); //vitesse nulle
@@ -1591,6 +2299,58 @@
                             this.nbSaut=2;
                             this.jump=false;
                             
+                        }
+
+                        if (this.cursors.space.isDown && this.direction == 'left' && this.foudrecollectee == false){
+                            this.player.setVelocityX(0)
+                            this.attacking = true
+                            this.player.anims.play('left_attaque', true);
+                            this.Spriteattackpersonnage.x = this.player.x - 16
+                            this.Spriteattackpersonnage.y = this.player.y
+                            setTimeout(() => {
+                                this.attacking = false
+                                this.Spriteattackpersonnage.x = 0
+                                this.Spriteattackpersonnage.y = 0
+                            }, 400);
+                        }
+
+                        if (this.cursors.space.isDown && this.direction == 'right' && this.foudrecollectee == false){
+                            this.player.setVelocityX(0)
+                            this.attacking = true
+                            this.player.anims.play('right_attaque', true);
+                            this.Spriteattackpersonnage.x = this.player.x + 16
+                            this.Spriteattackpersonnage.y = this.player.y
+                            setTimeout(() => {
+                                this.attacking = false
+                                this.Spriteattackpersonnage.x = 0
+                                this.Spriteattackpersonnage.y = 0
+                            }, 400);
+                        }
+
+                        if (this.cursors.space.isDown && this.direction == 'left' && this.foudrecollectee == true){
+                            this.player.setVelocityX(0)
+                            this.attackingElectrique = true
+                            this.player.anims.play('left_attaque_electrique', true);
+                            this.Spriteattackpersonnage.x = this.player.x - 16
+                            this.Spriteattackpersonnage.y = this.player.y
+                            setTimeout(() => {
+                                this.attackingElectrique = false
+                                this.Spriteattackpersonnage.x = 0
+                                this.Spriteattackpersonnage.y = 0
+                            }, 400);
+                        }
+
+                        if (this.cursors.space.isDown && this.direction == 'right' && this.foudrecollectee == true){
+                            this.player.setVelocityX(0)
+                            this.attackingElectrique = true
+                            this.player.anims.play('right_attaque_electrique', true);
+                            this.Spriteattackpersonnage.x = this.player.x + 16
+                            this.Spriteattackpersonnage.y = this.player.y
+                            setTimeout(() => {
+                                this.attackingElectrique = false
+                                this.Spriteattackpersonnage.x = 0
+                                this.Spriteattackpersonnage.y = 0
+                            }, 400);
                         }
 
                         if (Phaser.Input.Keyboard.JustDown(this.cursors.up) && this.nbSaut>0){
@@ -1612,6 +2372,11 @@
                         }
 
                     }
+
+                    sleep = (milliseconds) => {
+                        return new Promise(resolve => setTimeout(resolve, milliseconds));
+                    }
+                
                 }
 
                 class Gameover extends Phaser.Scene {
@@ -1745,6 +2510,7 @@
                     if (this.petitecleecollectee == true && this.cursors.down.isDown) {
 
                         coffre.destroy();
+                        this.couronne.setAlpha(1)
                     }
                 }
 
@@ -1757,27 +2523,39 @@
                     }
 
                     if (this.nombrecollide == 4){
-                        this.barreDeVie.setTexture("Barre_PV_4");
-                        this.barreDeVie.setInteractive();
-                        this.barreDeVie.setScrollFactor(0);
+                        this.barreDeVie.setTexture("SpriteHealthbar45");
+                        this.sleep(300).then(() => {
+                            this.barreDeVie.setTexture("Barre_PV_4");
+                            this.barreDeVie.setInteractive();
+                            this.barreDeVie.setScrollFactor(0);
+                        })
                     }
 
                     if (this.nombrecollide == 3){
+                        this.barreDeVie.setTexture("SpriteHealthbar35");
+                        this.sleep(300).then(() => {
                         this.barreDeVie.setTexture("Barre_PV_3");
                         this.barreDeVie.setInteractive();
                         this.barreDeVie.setScrollFactor(0);
+                        })
                     }
 
                     if (this.nombrecollide == 2){
+                        this.barreDeVie.setTexture("SpriteHealthbar25");
+                        this.sleep(300).then(() => {
                         this.barreDeVie.setTexture("Barre_PV_2");
                         this.barreDeVie.setInteractive();
                         this.barreDeVie.setScrollFactor(0);
+                        })
                     }
 
                     if (this.nombrecollide == 1){
+                        this.barreDeVie.setTexture("SpriteHealthbar15");
+                        this.sleep(300).then(() => {
                         this.barreDeVie.setTexture("Barre_PV_1");
                         this.barreDeVie.setInteractive();
                         this.barreDeVie.setScrollFactor(0);
+                        })
                     }
 
                     if (this.nombrecollide <= 0){
@@ -1819,19 +2597,19 @@
 
                 function Passage_Scene_1(player, sapin_colide){
 
-                    this.scene.start("Scene_ennemis",{x:100,y:100});
+                    this.scene.start("Scene_ennemis",{x:100,y:100},{Score: this.score});
 
                 }
 
                 function Passage_Scene_2(player, sapin_collide){
 
-                    this.scene.start("Scene_loot",{x:100,y:100});
+                    this.scene.start("Scene_loot",{x:100,y:100},{Score: this.score});
 
                 }
 
                 function Passage_Scene_3(player, colide_sapin){
 
-                    this.scene.start("Scene_finale",{x:100,y:100});
+                    this.scene.start("Scene_finale",{x:100,y:100},{Score: this.score});
 
                 }
 
@@ -1850,7 +2628,7 @@
                                     default: 'arcade',
                                     arcade: {
                                         gravity: {y: 500},
-                                        debug: true
+                                        debug: false
                                     }
                                 },
                                 scene: [Acceuil,Frolegatt,Scene_ennemis,Scene_loot,Scene_finale,Victory,Gameover]
